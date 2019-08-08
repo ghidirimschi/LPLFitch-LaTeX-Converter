@@ -4,14 +4,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import proof.Inference;
-import proof.Premise;
-import proof.Proof;
-import proof.SubProof;
+import proof.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 public final class Parser {
 
@@ -58,7 +56,7 @@ public final class Parser {
                     proof.addStep(parseInference(curr.child(0)));
                     break;
                 case "proof":
-                    proof.addStep(parseSubProof(curr.child(0)));
+                    proof.addStep(parseSubProof(curr));
                     break;
                 default:
                     throw new IOException("Invalid proof html document. Code #0005.");
@@ -92,12 +90,40 @@ public final class Parser {
         if(wffWrapper == null || ruleNameWrapper == null || ruleSupportWrapper == null) {
             throw new IOException("Invalid proof html document. Code #0009.");
         }
-
-        return null;
+        InferenceRule inferenceRule = InferenceRule.parseInferenceRule(ruleNameWrapper.text().trim());
+        if(inferenceRule == null) {
+            throw new IOException("Invalid proof html document. Code #0010.");
+        }
+        return new Inference(wffWrapper.text(), inferenceRule, ruleSupportWrapper.text().substring(3));
     }
 
     private static SubProof parseSubProof(Element subProofWrapper) throws IOException {
-
+        Elements children = subProofWrapper.children();
+        Element premiseWrapper = children.first();
+        Element fitchBar = children.get(1);
+        if(premiseWrapper == null || !premiseWrapper.tagName().equals("div") || !premiseWrapper.attr("class").equals("step")) {
+            throw new IOException("Invalid proof html document. Code #0011.");
+        }
+        if(fitchBar == null || !fitchBar.tagName().equals("div") || !fitchBar.attr("class").equals("fitchbar")) {
+            throw new IOException("Invalid proof html document. Code #0012.");
+        }
+        SubProof subProof = new SubProof(parsePremise(premiseWrapper));
+        List<Element> subProofStepsWrapper = children.subList(2, children.size());
+        for(Element curr : subProofStepsWrapper) {
+            if (!curr.tagName().equals("div")) {
+                throw new IOException("Invalid proof html document. Code #0013.");
+            }
+            switch (curr.attr("class")) {
+                case "step":
+                    subProof.addStep(parseInference(curr.child(0)));
+                    break;
+                case "proof":
+                    subProof.addStep(parseSubProof(curr));
+                    break;
+                default:
+                    throw new IOException("Invalid proof html document. Code #0014.");
+            }
+        }
         return null;
     }
 

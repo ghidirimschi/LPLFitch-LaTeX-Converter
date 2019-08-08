@@ -22,4 +22,8 @@ public class Proof {
     public ArrayList<Premise> getPremises() {
         return premises;
     }
+
+    public ArrayList<Step> getSteps() {
+        return steps;
+    }
 }
