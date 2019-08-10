@@ -3,20 +3,30 @@ package proof;
 import java.util.HashMap;
 
 public enum InferenceRule {
-    UNDEFINED,
-    REIT,
-    CONJ_INTRO,
-    CONJ_ELIM,
-    DISJ_INTRO,
-    DISJ_ELIM,
-    IMPL_INTRO,
-    IMPL_ELIM,
-    EQIV_INTRO,
-    EQIV_ELIM,
-    NEGT_INTRO,
-    NEGT_ELIM,
-    CNTR_INTRO,
-    CNTR_ELIM;
+    UNDEFINED (""),
+    REIT ("\\r"),
+    CONJ_INTRO ("\\ai"),
+    CONJ_ELIM ("\\ae"),
+    DISJ_INTRO ("\\oi"),
+    DISJ_ELIM ("\\oe"),
+    IMPL_INTRO ("\\ii"),
+    IMPL_ELIM ("\\ie"),
+    EQIV_INTRO ("undefined"),
+    EQIV_ELIM ("undefined"),
+    NEGT_INTRO ("\\ni"),
+    NEGT_ELIM ("\\ne"),
+    CNTR_INTRO ("\\ne"),
+    CNTR_ELIM ("\\be");
+
+    InferenceRule(String latexCode) {
+        this.latexCode = latexCode;
+    }
+
+    private final String latexCode;
+
+    public String getLatexCode() {
+        return latexCode;
+    }
 
     private final static HashMap<String, InferenceRule> hashMap = new HashMap<>();
     static {
@@ -35,6 +45,7 @@ public enum InferenceRule {
         hashMap.put("\u22A5 Intro", CNTR_INTRO);
         hashMap.put("\u22A5 Elim", CNTR_ELIM);
     }
+
 
     public static InferenceRule parseInferenceRule(String s) {
         return hashMap.get(s);

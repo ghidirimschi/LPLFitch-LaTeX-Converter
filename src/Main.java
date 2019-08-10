@@ -1,4 +1,5 @@
 import parser.Parser;
+import proof.Proof;
 
 import java.io.IOException;
 
@@ -9,11 +10,13 @@ public class Main {
             System.out.println("Please indicate the html file name.");
             return;
         }
+        Proof proof = null;
         try {
-            Parser.parse(args[0]);
+             proof = Parser.parse(args[0]);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        proof.printLatex();
 
     }
 }

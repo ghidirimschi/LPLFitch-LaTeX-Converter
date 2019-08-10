@@ -94,7 +94,7 @@ public final class Parser {
         if(inferenceRule == null) {
             throw new IOException("Invalid proof html document. Code #0010.");
         }
-        return new Inference(wffWrapper.text(), inferenceRule, ruleSupportWrapper.text().substring(3));
+        return new Inference(wffWrapper.text(), inferenceRule, ruleSupportWrapper.text().substring(2));
     }
 
     private static SubProof parseSubProof(Element subProofWrapper) throws IOException {
@@ -124,7 +124,7 @@ public final class Parser {
                     throw new IOException("Invalid proof html document. Code #0014.");
             }
         }
-        return null;
+        return subProof;
     }
 
 }
