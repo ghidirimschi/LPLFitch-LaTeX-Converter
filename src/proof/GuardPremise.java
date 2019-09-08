@@ -11,7 +11,7 @@ public class GuardPremise extends Premise {
     }
 
     @Override
-    void printLatex(MutableInt row) {
-        System.out.println("\t\\hypo {" + row.getAndIncrement() + "} {\\boxed{" + guardVar + "} " +  Operator.convertWff(getWff()) + "}");
+    void exportLatex(StringBuilder sb, MutableInt row) {
+        sb.append("\t\\hypo {").append(row.getAndIncrement()).append("} {\\boxed{").append(guardVar).append("} ").append(Operator.convertWff(getWff())).append("}\n");
     }
 }

@@ -31,12 +31,12 @@ public class SubProof implements Step {
     }
 
     @Override
-    public void printLatex(MutableInt row) {
-        System.out.println("\t\\open");
-        premise.printLatex(row);
+    public void exportLatex(StringBuilder sb, MutableInt row) {
+        sb.append("\t\\open\n");
+        premise.exportLatex(sb, row);
         for(Step step : steps) {
-            step.printLatex(row);
+            step.exportLatex(sb, row);
         }
-        System.out.println("\t\\close");
+        sb.append("\t\\close\n");
     }
 }

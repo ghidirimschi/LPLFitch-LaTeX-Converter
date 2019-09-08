@@ -39,15 +39,17 @@ public class Proof {
         }
     }
 
-    public void printLatex() {
+    public String exportLatex() {
+        StringBuilder sb = new StringBuilder();
         MutableInt row = new MutableInt(1);
-        System.out.println("\\[\n\\begin{nd}");
+        sb.append("\\[\n\\begin{nd}\n");
         for(Premise premise : premises) {
-            premise.printLatex(row);
+            premise.exportLatex(sb, row);
         }
         for(Step step : steps) {
-            step.printLatex(row);
+            step.exportLatex(sb, row);
         }
-        System.out.println("\\end{nd}\n\\]");
+        sb.append("\\end{nd}\n\\]");
+        return sb.toString();
     }
 }

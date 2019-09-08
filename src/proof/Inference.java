@@ -29,7 +29,8 @@ public class Inference implements Step {
     }
 
     @Override
-    public void printLatex(MutableInt row) {
-        System.out.println("\t\\have {" + row.getAndIncrement() + "} {" + Operator.convertWff(wff) + "} \t " + rule.getLatexCode() + "{" + ruleSupport + "}");
+    public void exportLatex(StringBuilder sb, MutableInt row) {
+        sb.append("\t\\have {").append(row.getAndIncrement()).append("} {").append(Operator.convertWff(wff)).append("} \t ").
+                append(rule.getLatexCode()).append("{").append(ruleSupport).append("}\n");
     }
 }

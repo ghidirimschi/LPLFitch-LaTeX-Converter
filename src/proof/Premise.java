@@ -20,7 +20,7 @@ public class Premise {
         System.out.println(' ' + wff);
     }
 
-    void printLatex(MutableInt row) {
-        System.out.println("\t\\hypo {" + row.getAndIncrement() + "} {" + Operator.convertWff(wff) + "}");
+    void exportLatex(StringBuilder sb, MutableInt row) {
+        sb.append("\t\\hypo {").append(row.getAndIncrement()).append("} {").append(Operator.convertWff(wff)).append("}\n");
     }
 }

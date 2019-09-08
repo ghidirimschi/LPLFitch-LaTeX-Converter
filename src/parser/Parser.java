@@ -13,8 +13,7 @@ import java.util.List;
 
 public final class Parser {
 
-    public static Proof parse(String fileName) throws IOException {
-        File input = new File(fileName);
+    public static Proof parse(File input) throws IOException {
         Document doc = Jsoup.parse(input, "UTF-8");
         Element mainDiv = doc.selectFirst("div.proof-inner-outline");
         if(mainDiv == null || !mainDiv.child(0).attr("class").equals("proof")) {
