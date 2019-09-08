@@ -79,6 +79,23 @@ public final class Parser {
         return new Premise(wffWrapper.text());
     }
 
+    private static Premise parseSubProofPremise(Element premiseWrapper) throws IOException {
+        Element table = premiseWrapper.selectFirst("table");
+        if(table == null) {
+            throw new IOException("Invalid proof html document. Code #0006.");
+        }
+        Element wffWrapper = table.selectFirst("span[class=stepFormula]");
+        if(wffWrapper == null) {
+            throw new IOException("Invalid proof html document. Code #0007.");
+        }
+        Element guardWrapper = table.selectFirst("span[class=boxedconstants]");
+        if(guardWrapper == null) {
+            return new Premise(wffWrapper.text());
+        } else {
+            return new GuardPremise(wffWrapper.text(), guardWrapper.text());
+        }
+    }
+
     private static Inference parseInference(Element inferenceWrapper) throws IOException {
         Element table = inferenceWrapper.selectFirst("table");
         if(table == null) {
@@ -94,7 +111,7 @@ public final class Parser {
         if(inferenceRule == null) {
             throw new IOException("Invalid proof html document. Code #0010.");
         }
-        return new Inference(wffWrapper.text(), inferenceRule, ruleSupportWrapper.text().substring(2));
+        return new Inference(wffWrapper.text(), inferenceRule, ruleSupportWrapper.hasText() ? ruleSupportWrapper.text().substring(2) : "");
     }
 
     private static SubProof parseSubProof(Element subProofWrapper) throws IOException {
@@ -107,7 +124,7 @@ public final class Parser {
         if(fitchBar == null || !fitchBar.tagName().equals("div") || !fitchBar.attr("class").equals("fitchbar")) {
             throw new IOException("Invalid proof html document. Code #0012.");
         }
-        SubProof subProof = new SubProof(parsePremise(premiseWrapper));
+        SubProof subProof = new SubProof(parseSubProofPremise(premiseWrapper));
         List<Element> subProofStepsWrapper = children.subList(2, children.size());
         for(Element curr : subProofStepsWrapper) {
             if (!curr.tagName().equals("div")) {
