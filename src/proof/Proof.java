@@ -42,14 +42,14 @@ public class Proof {
     public String exportLatex() {
         StringBuilder sb = new StringBuilder();
         MutableInt row = new MutableInt(1);
-        sb.append("\\[\n\\begin{nd}\n");
+        sb.append("$\n\\begin{nd}\n");
         for(Premise premise : premises) {
             premise.exportLatex(sb, row);
         }
         for(Step step : steps) {
             step.exportLatex(sb, row);
         }
-        sb.append("\\end{nd}\n\\]");
+        sb.append("\\end{nd}\n$\n");
         return sb.toString();
     }
 }

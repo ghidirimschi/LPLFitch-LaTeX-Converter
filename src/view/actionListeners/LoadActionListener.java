@@ -22,10 +22,11 @@ public class LoadActionListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         final JFileChooser fileChooser = new JFileChooser(lastDirectory);
+        fileChooser.setMultiSelectionEnabled(true);
         fileChooser.setFileFilter(filter);
         int rtn = fileChooser.showOpenDialog(menu.getFrame());
         if(rtn == JFileChooser.APPROVE_OPTION) {
-            menu.updateParse(fileChooser.getSelectedFile());
+            menu.updateParse(fileChooser.getSelectedFiles());
             lastDirectory = fileChooser.getCurrentDirectory();
         }
     }

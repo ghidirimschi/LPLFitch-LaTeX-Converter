@@ -75,12 +75,19 @@ public class Menu {
         return frame;
     }
 
-    public void updateParse(File file) {
-        try {
-            outputArea.setText(Parser.parse(file).exportLatex());
-        } catch (IOException e) {
-            setStatus("Parsing error! <font color = 'red'>" + e.getMessage() + "</font>");
+    public void updateParse(File[] files) {
+        StringBuilder texText = new StringBuilder();
+        for(File file : files) {
+            try {
+                texText.append("\\subsection*{").append(file.getName().replaceFirst("[.][^.]+$", "")).append("}");
+                texText.append(Parser.parse(file).exportLatex());
+            } catch (IOException e) {
+                setStatus("Error parsing " + file.getName() +"! <font color = 'red'>" + e.getMessage() + "</font>");
+                return;
+            }
+            setStatus("<font color = 'green'> Successfully converted " + files.length + " files! </font>");
         }
+        outputArea.setText(texText.toString());
         setStatus("<font color = 'green'> Successfully converted! </font>");
     }
 
