@@ -2,7 +2,31 @@ package proof;
 
 import org.apache.commons.lang3.StringUtils;
 
-public final class Operator {
+public enum Operator {
+    LAND("\u2227", "\\land "),
+    LOR("\u2228", "\\lor "),
+    LIF("\u2192", "\\rightarrow "),
+    LIFF("\u2194", "\\leftrightarrow "),
+    LNOT("\u00AC", "\\neg "),
+    LCONTR("\u22A5", "\\bot "),
+    LALL("\u2200", "\\forall "),
+    LEXST("\u2203", "\\exists "),
+    EQUALS("=", "=");
+
+    private final String UTFCode;
+    private final String TEXCode;
+
+
+    Operator(String UTFCode, String TEXCode) {
+        this.UTFCode = UTFCode;
+        this.TEXCode = TEXCode;
+
+    }
+
+    public String getUTFCode() {
+        return UTFCode;
+    }
+
     private static final String[] htmlchars = new String[]{"\u2227", "\u2228", "\u2192", "\u2194", "\u00AC", "\u22A5", "\u2200", "\u2203"};
     private static final String[] texCodes = new String[]{"\\land ", "\\lor ", "\\rightarrow ", "\\leftrightarrow ", "\\neg ", "\\bot ", "\\forall ", "\\exists "};
 
