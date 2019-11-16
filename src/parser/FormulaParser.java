@@ -13,7 +13,7 @@ public final class FormulaParser {
     }
 
     private static Formula parseFormula(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
-        ArrayList<Quantifier> quantifiers = new ArrayList<>(2);
+        ArrayList<Quantifier> quantifiers = new ArrayList<>(1);
         while (tkn.equals(Operator.LEXST.getUTFCode()) || tkn.equals(Operator.LALL.getUTFCode())) {
             String freeVar = parseFreeVariable(tokenizer.nextToken());
             quantifiers.add(tkn.equals(Operator.LEXST.getUTFCode()) ? new Exists(freeVar) : new Forall(freeVar));
