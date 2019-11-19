@@ -55,4 +55,12 @@ public final class Atom {
         atoms.add(this);
         return new Disjunction(atoms).toFormula();
     }
+
+    public int getNegationNr() {
+        return negationNr;
+    }
+
+    public Predicate getPredicate() {
+        return predicate;
+    }
 }

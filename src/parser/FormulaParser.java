@@ -1,83 +1,76 @@
 package parser;
 
-import formula.*;
+import formulanew.*;
 import proof.Operator;
 import tokenizer.FormulaTokenizer;
 
 import java.util.ArrayList;
 
 public final class FormulaParser {
-    public static Formula parse(String formulaString) throws FormulaParsingException {
+    public static Sentence parse(String formulaString) throws FormulaParsingException {
         FormulaTokenizer tokenizer = new FormulaTokenizer(formulaString);
         return parseFormula(tokenizer.nextToken(), tokenizer);
     }
 
-    private static Formula parseFormula(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
+    private static Sentence parseFormula(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
+        Sentence first = parseAtomic(tkn, tokenizer);
+        if (tokenizer.isNextEqualTo(Operator.LAND.getUTFCode())) {
+            Sentence second = parseFormula(tokenizer.nextToken(), tokenizer);
+            while (tokenizer.isNextEqualTo(Operator.LAND.getUTFCode())) {
+                second = new Conjunction(second, parseFormula(tokenizer.nextToken(), tokenizer));
+            }
+            return new Conjunction(first, second);
+        } else if (tokenizer.isNextEqualTo(Operator.LOR.getUTFCode())) {
+            Sentence second = parseFormula(tokenizer.nextToken(), tokenizer);
+            while (tokenizer.isNextEqualTo(Operator.LOR.getUTFCode())) {
+                second = new Disjunction(second, parseFormula(tokenizer.nextToken(), tokenizer));
+            }
+            return new Disjunction(first, second);
+        } else if (tokenizer.isNextEqualTo(Operator.LIF.getUTFCode())) {
+            return new Implication(first, parseFormula(tokenizer.nextToken(), tokenizer));
+        } else if (tokenizer.isNextEqualTo(Operator.LIFF.getUTFCode())) {
+            return new BiImplication(first, parseFormula(tokenizer.nextToken(), tokenizer));
+        }
+        return first;
+    }
+
+    private static Sentence parseAtomic(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
+        if (tkn.equals(Operator.LNOT.getUTFCode())) {
+            return new Negation(parseAtomic(tokenizer.nextToken(), tokenizer));
+        }
         ArrayList<Quantifier> quantifiers = new ArrayList<>(1);
         while (tkn.equals(Operator.LEXST.getUTFCode()) || tkn.equals(Operator.LALL.getUTFCode())) {
             String freeVar = parseFreeVariable(tokenizer.nextToken());
             quantifiers.add(tkn.equals(Operator.LEXST.getUTFCode()) ? new Exists(freeVar) : new Forall(freeVar));
             tkn = tokenizer.nextToken();
         }
-        return new Formula(quantifiers, parseWff(tkn, tokenizer));
-    }
-
-    private static Wff parseWff(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
-        Implication antecedent = parseImplication(tkn, tokenizer);
-        return new Wff(antecedent, tokenizer.isNextEqualTo(Operator.LIFF.getUTFCode())
-                ? parseImplication(tokenizer.nextToken(), tokenizer) : null);
-    }
-
-    private static Implication parseImplication(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
-
-        Conjunction antecedent = parseConjunction(tkn, tokenizer);
-        return new Implication(antecedent, tokenizer.isNextEqualTo(Operator.LIF.getUTFCode())
-                ? parseConjunction(tokenizer.nextToken(), tokenizer) : null);
-    }
-
-    private static Conjunction parseConjunction(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
-        ArrayList<Disjunction> disjunctions = new ArrayList<>(2);
-        disjunctions.add(parseDisjunction(tkn, tokenizer));
-        while (tokenizer.hasMoreTokens() && tokenizer.isNextEqualTo(Operator.LAND.getUTFCode())) {
-            disjunctions.add(parseDisjunction(tokenizer.nextToken(), tokenizer));
+        if (!quantifiers.isEmpty()) {
+            return new QuantifierFormula(quantifiers, parseAtomic(tkn, tokenizer));
         }
-        return new Conjunction(disjunctions);
-    }
-
-    private static Disjunction parseDisjunction(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
-        ArrayList<Atom> atoms = new ArrayList<>(2);
-        atoms.add(parseAtom(tkn, tokenizer));
-        while (tokenizer.hasMoreTokens() && tokenizer.isNextEqualTo(Operator.LOR.getUTFCode())) {
-            atoms.add(parseAtom(tokenizer.nextToken(), tokenizer));
+        if (tkn.equals("(")) {
+            Sentence rtn = parseFormula(tokenizer.nextToken(), tokenizer);
+            if (!tokenizer.isNextEqualTo(")")) {
+                throw new FormulaParsingException("No closing parenthesis!");
+            }
+            return rtn;
         }
-        return new Disjunction(atoms);
-
+        return parseTerminal(tkn, tokenizer);
     }
 
-    private static Atom parseAtom(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
-        int nrNeg = 0;
-        while (tkn.equals(Operator.LNOT.getUTFCode())) {
-            ++nrNeg;
-            tkn = tokenizer.nextToken();
-        }
-        return new Atom(nrNeg, parsePredicate(tkn, tokenizer));
-    }
-
-    private static Predicate parsePredicate(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
+    private static Sentence parseTerminal(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
         if (Character.isUpperCase(tkn.charAt(0))) {
             return parsePredicateSymbol(tkn, tokenizer);
         }
         if (Character.isLowerCase(tkn.charAt(0))) {
             return parseEquality(tkn, tokenizer);
         }
-        if (tkn.equals("(")) {
-            return parseNestedFormula(tokenizer.nextToken(), tokenizer);
-        }
         if (tkn.equals(Operator.LCONTR.getUTFCode())) {
             return Contradiction.getInstance();
         }
         throw new FormulaParsingException("Invalid predicate!");
     }
+
+
 
     private static PredicateSymbol parsePredicateSymbol(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
         if (!tkn.matches("[A-Z][A-Za-z0-9]*")) {
@@ -125,16 +118,8 @@ public final class FormulaParser {
     }
 
 
-
-    private static NestedFormula parseNestedFormula(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
-        Formula formula = parseFormula(tkn, tokenizer);
-        if (!tokenizer.isNextEqualTo(")")) {
-            throw new FormulaParsingException("No closing parenthesis! #3");
-        }
-        return new NestedFormula(formula);
-    }
-
     private static String parseFreeVariable(String tkn) throws FormulaParsingException {
+        System.out.println("PArsing" + tkn);
         if (tkn.length() != 1 || tkn.charAt(0) < 't' || tkn.charAt(0) > 'z') {
             throw new FormulaParsingException("A free variable may only be a letter from t to z.");
         }

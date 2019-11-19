@@ -26,13 +26,10 @@ public enum InferenceRule {
                 throw new InvalidRuleApplicationException(ruleName, "The derived formula should be conjunction!");
             }
             ArrayList<Disjunction> conjuncts = formula.getWff().getAntecedent().getAntecedent().getDisjunctions();
-            if (citedSteps.size() != conjuncts.size()) {
-                throw new InvalidRuleApplicationException(ruleName, "A conjunction of " + conjuncts.size() + " should cite " + conjuncts.size() + "steps! Only "
-                + citedSteps.size() + "cited!");
-            }
             ArrayList<Formula> formConj = new ArrayList<>(conjuncts.size());
-            conjuncts.forEach(s -> formConj.add(s.toFormula()));
-            return formConj.equals(citedSteps);
+            conjuncts.forEach(s -> formConj.add(s.toFormula().simplified()));
+            if (pedantic) return formConj.equals(citedSteps);
+            return formConj.containsAll(citedSteps) && citedSteps.containsAll(formConj);
         }
     }, CONJ_ELIM("\u2227 Elim", "\\by{$\\land$ Elim}") {
         @Override
