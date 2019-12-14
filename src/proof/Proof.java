@@ -1,6 +1,11 @@
 package proof;
 
+import abstractProof.AbstractProof;
+import abstractProof.AbstractStep;
+import formulanew.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
+import parser.FormulaParser;
+import parser.FormulaParsingException;
 
 import java.util.ArrayList;
 
@@ -51,5 +56,24 @@ public class Proof {
         }
         sb.append("\\end{nd}\n$\n");
         return sb.toString();
+    }
+
+    public AbstractProof toAbstract() throws ConverterException {
+        MutableInt rowNr = new MutableInt(1);
+        ArrayList<Sentence> aPremises = new ArrayList<>(premises.size());
+        for (Premise premise : premises) {
+            try {
+                aPremises.add(FormulaParser.parse(premise.getWff()));
+            } catch (FormulaParsingException e) {
+                throw new ConverterException(rowNr.intValue(), e.getMessage());
+            }
+            rowNr.increment();
+        }
+        ArrayList<AbstractStep> aSteps = new ArrayList<>(steps.size());
+        for (Step step : steps) {
+            aSteps.add(step.toAbstract(rowNr));
+        }
+        return new AbstractProof(aPremises, aSteps);
+
     }
 }

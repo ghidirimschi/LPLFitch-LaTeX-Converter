@@ -1,7 +1,13 @@
 package proof;
 
+import abstractProof.AbstractInference;
 import abstractProof.AbstractStep;
+import formulanew.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
+import parser.FormulaParser;
+import parser.FormulaParsingException;
+
+import java.util.ArrayList;
 
 public class Inference implements Step {
     private String wff;
@@ -36,8 +42,25 @@ public class Inference implements Step {
     }
 
     @Override
-    public AbstractStep toAbstract(MutableInt rowNr) throws InvalidRuleApplicationException {
-       return null;
-    }
+    public AbstractStep toAbstract(MutableInt rowNr) throws ConverterException {
+        Sentence aWff;
+        try {
+            aWff = FormulaParser.parse(wff);
+        } catch (FormulaParsingException e) {
+            throw new ConverterException(rowNr.intValue(), e.getMessage());
+        }
+        rowNr.increment();
+        String [] strSteps = ruleSupport.split(",");
+        ArrayList<Integer> citedSteps = new ArrayList<>(strSteps.length);
+        for (String str : strSteps) {
+            try {
+                citedSteps.add(Integer.valueOf(str));
+            } catch (NumberFormatException e) {
+                throw new ConverterException(rowNr.intValue(), "Cited step must be a positive integer!");
+            }
+            rowNr.increment();
+        }
+        return new AbstractInference(aWff, rule.toAbstract(), citedSteps);
+     }
 
 }

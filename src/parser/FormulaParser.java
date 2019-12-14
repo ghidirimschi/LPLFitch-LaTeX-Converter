@@ -122,7 +122,6 @@ public final class FormulaParser {
 
 
     private static String parseFreeVariable(String tkn) throws FormulaParsingException {
-        System.out.println("PArsing" + tkn);
         if (tkn.length() != 1 || tkn.charAt(0) < 't' || tkn.charAt(0) > 'z') {
             throw new FormulaParsingException("A free variable may only be a letter from t to z.");
         }

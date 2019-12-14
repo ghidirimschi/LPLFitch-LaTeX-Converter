@@ -1,7 +1,11 @@
 package proof;
 
 import abstractProof.AbstractStep;
+import abstractProof.AbstractSubProof;
+import formulanew.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
+import parser.FormulaParser;
+import parser.FormulaParsingException;
 
 import java.util.ArrayList;
 
@@ -42,7 +46,18 @@ public class SubProof implements Step {
     }
 
     @Override
-    public AbstractStep toAbstract(MutableInt rowNr) throws InvalidRuleApplicationException {
-        return null;
+    public AbstractStep toAbstract(MutableInt rowNr) throws ConverterException {
+        Sentence aPremise;
+        try {
+            aPremise = FormulaParser.parse(premise.getWff());
+        } catch (FormulaParsingException e) {
+            throw new ConverterException(rowNr.intValue(), e.getMessage());
+        }
+        rowNr.increment();
+        ArrayList<AbstractStep> abstractSteps = new ArrayList<>(steps.size());
+        for (Step step : steps) {
+            abstractSteps.add(step.toAbstract(rowNr));
+        }
+        return new AbstractSubProof(aPremise, abstractSteps);
     }
 }

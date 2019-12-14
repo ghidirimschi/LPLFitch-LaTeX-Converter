@@ -1,11 +1,8 @@
 import formulanew.*;
 import parser.FormulaParser;
 import parser.FormulaParsingException;
-import proof.InvalidRuleApplicationException;
+import view.Menu;
 
-import java.util.ArrayList;
-
-import static proof.InferenceRule.CONJ_INTRO;
 
 public class Main {
 
@@ -22,12 +19,14 @@ public class Main {
 //        }
 //        proof.exportLatex();
 //      FROM HERE WAS CORRECT:
-//      new Menu();
-        try {
-            Sentence sentence = FormulaParser.parse("¬¬A ∧ ¬(B ∨ D) ∧ (¬¬¬D ∨ K ∨ ¬∀x P(x))");
-            System.out.println(sentence);
-        } catch (FormulaParsingException e) {
-            e.printStackTrace();
-        }
+      new Menu();
+//        try {
+//            Sentence sentence = FormulaParser.parse("¬¬A ∧ ¬(B ∨ D) ∧ (¬¬¬D ∨ K ∨ ¬∀x P(x))");
+//            System.out.println(sentence);
+//        } catch (FormulaParsingException e) {
+//            e.printStackTrace();
+//        }
+
+
     }
 }

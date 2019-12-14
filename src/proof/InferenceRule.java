@@ -1,17 +1,18 @@
 package proof;
 
+import abstractProof.AbstractRule;
 import formula.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public enum InferenceRule {
-    UNDEFINED("unspecified rule", "") {
+    UNDEFINED("unspecified rule", "", AbstractRule.AUNDEFINED) {
         @Override
         public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return false;
         }
-    }, REIT("Reit", "\\by{reit}") {
+    }, REIT("Reit", "\\by{reit}", AbstractRule.AREIT) {
         @Override
         public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             if (citedSteps.size() != 1) {
@@ -19,11 +20,11 @@ public enum InferenceRule {
             }
             return formula.equals(citedSteps.get(0));
         }
-    }, CONJ_INTRO("\u2227 Intro", "\\by{$\\land$ Intro}") {
+    }, CONJ_INTRO("\u2227 Intro", "\\by{$\\land$ Intro}", AbstractRule.ACONJ_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             if (formula.getMainOperator() != Operator.LAND) {
-                throw new InvalidRuleApplicationException(ruleName, "The derived formula should be conjunction!");
+                return false;
             }
             ArrayList<Disjunction> conjuncts = formula.getWff().getAntecedent().getAntecedent().getDisjunctions();
             ArrayList<Formula> formConj = new ArrayList<>(conjuncts.size());
@@ -31,99 +32,102 @@ public enum InferenceRule {
             if (pedantic) return formConj.equals(citedSteps);
             return formConj.containsAll(citedSteps) && citedSteps.containsAll(formConj);
         }
-    }, CONJ_ELIM("\u2227 Elim", "\\by{$\\land$ Elim}") {
+    }, CONJ_ELIM("\u2227 Elim", "\\by{$\\land$ Elim}", AbstractRule.ACONJ_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, DISJ_INTRO("\u2228 Intro", "\\by{$\\lor$ Intro}") {
+    }, DISJ_INTRO("\u2228 Intro", "\\by{$\\lor$ Intro}", AbstractRule.ADISJ_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, DISJ_ELIM("\u2228 Elim", "\\by{$\\lor$ Elim}") {
+    }, DISJ_ELIM("\u2228 Elim", "\\by{$\\lor$ Elim}", AbstractRule.ADISJ_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, IMPL_INTRO("\u2192 Intro", "\\by{$\\rightarrow$ Intro}") {
+    }, IMPL_INTRO("\u2192 Intro", "\\by{$\\rightarrow$ Intro}", AbstractRule.AIMPL_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, IMPL_ELIM("\u2192 Elim", "\\by{$\\rightarrow$ Elim}") {
+    }, IMPL_ELIM("\u2192 Elim", "\\by{$\\rightarrow$ Elim}", AbstractRule.AIMPL_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, EQIV_INTRO("\u2194 Intro", "\\by{$\\leftrightarrow$ Intro}") {
+    }, EQIV_INTRO("\u2194 Intro", "\\by{$\\leftrightarrow$ Intro}", AbstractRule.AEQIV_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, EQIV_ELIM("\u2194 Elim", "\\by{$\\leftrightarrow$ Elim}") {
+    }, EQIV_ELIM("\u2194 Elim", "\\by{$\\leftrightarrow$ Elim}", AbstractRule.AEQIV_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, NEGT_INTRO("\u00AC Intro", "\\by{$\\neg$ Intro}") {
+    }, NEGT_INTRO("\u00AC Intro", "\\by{$\\neg$ Intro}", AbstractRule.ANEGT_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, NEGT_ELIM("\u00AC Elim", "\\by{$\\neg$ Elim}") {
+    }, NEGT_ELIM("\u00AC Elim", "\\by{$\\neg$ Elim}", AbstractRule.ANEGT_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, CNTR_INTRO("\u22A5 Intro", "\\by{$\\bot$ Intro}") {
+    }, CNTR_INTRO("\u22A5 Intro", "\\by{$\\bot$ Intro}", AbstractRule.ACNTR_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, CNTR_ELIM("\u22A5 Elim", "\\by{$\\bot$ Elim}") {
+    }, CNTR_ELIM("\u22A5 Elim", "\\by{$\\bot$ Elim}", AbstractRule.ACNTR_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, UNVR_INTRO("\u2200 Intro", "\\by{$\\forall$ Intro}") {
+    }, UNVR_INTRO("\u2200 Intro", "\\by{$\\forall$ Intro}", AbstractRule.AUNVR_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, UNVR_ELIM("\u2200 Elim", "\\by{$\\forall$ Elim}") {
+    }, UNVR_ELIM("\u2200 Elim", "\\by{$\\forall$ Elim}", AbstractRule.AUNVR_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, EXST_INTRO("\u2203 Intro", "\\by{$\\exists$ Intro}") {
+    }, EXST_INTRO("\u2203 Intro", "\\by{$\\exists$ Intro}", AbstractRule.AEXST_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, EXST_ELIM("\u2203 Elim", "\\by{$\\exists$ Elim}") {
+    }, EXST_ELIM("\u2203 Elim", "\\by{$\\exists$ Elim}", AbstractRule.AEXST_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, EQLT_INTRO("= Intro", "\\by{$=$ Intro}") {
+    }, EQLT_INTRO("= Intro", "\\by{$=$ Intro}", AbstractRule.AEQLT_INTRO) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, EQLT_ELIM("= Elim", "\\by{$=$ Elim}") {
+    }, EQLT_ELIM("= Elim", "\\by{$=$ Elim}", AbstractRule.AEQIV_ELIM) {
         @Override
-        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException {
+        public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
     };
 
     private final String latexCode;
     public final String ruleName;
+    private final AbstractRule abstractRule;
 
-    InferenceRule(String ruleName, String latexCode) {
+    InferenceRule(String ruleName, String latexCode, AbstractRule abstractRule) {
         this.ruleName = ruleName;
         this.latexCode = latexCode;
+        this.abstractRule = abstractRule;
+
     }
 
 
@@ -160,5 +164,9 @@ public enum InferenceRule {
         return hashMap.get(s);
     }
 
-    public abstract boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) throws InvalidRuleApplicationException;
+    public AbstractRule toAbstract() {
+        return abstractRule;
+    }
+
+    public abstract boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic);
 }

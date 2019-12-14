@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 public final class AbstractSubProof implements AbstractStep {
     private final Sentence premise;
-    private final ArrayList<AbstractInference> inferences;
+    private final ArrayList<AbstractStep> steps;
 
-    public AbstractSubProof(Sentence premise, ArrayList<AbstractInference> inferences) {
+    public AbstractSubProof(Sentence premise, ArrayList<AbstractStep> steps) {
         this.premise = premise;
-        this.inferences = new ArrayList<>(inferences);
+        this.steps = new ArrayList<>(steps);
     }
 }
