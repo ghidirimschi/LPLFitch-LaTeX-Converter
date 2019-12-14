@@ -24,7 +24,7 @@ public class Main {
 //      FROM HERE WAS CORRECT:
 //      new Menu();
         try {
-            Sentence sentence = FormulaParser.parse("¬A ∧ B ∧ (D ∨ K ∨ ¬∀x P(x))");
+            Sentence sentence = FormulaParser.parse("¬¬A ∧ ¬(B ∨ D) ∧ (¬¬¬D ∨ K ∨ ¬∀x P(x))");
             System.out.println(sentence);
         } catch (FormulaParsingException e) {
             e.printStackTrace();

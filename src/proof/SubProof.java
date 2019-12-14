@@ -1,5 +1,6 @@
 package proof;
 
+import abstractProof.AbstractStep;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
@@ -38,5 +39,10 @@ public class SubProof implements Step {
             step.exportLatex(sb, row);
         }
         sb.append("\t\\close\n");
+    }
+
+    @Override
+    public AbstractStep toAbstract(MutableInt rowNr) throws InvalidRuleApplicationException {
+        return null;
     }
 }

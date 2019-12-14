@@ -1,5 +1,6 @@
 package proof;
 
+import abstractProof.AbstractStep;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 public class Inference implements Step {
@@ -33,4 +34,10 @@ public class Inference implements Step {
         sb.append("\t\\have {").append(row.getAndIncrement()).append("} {").append(Operator.convertWff(wff)).append("} \t ").
                 append(rule.getLatexCode()).append("{").append(ruleSupport).append("}\n");
     }
+
+    @Override
+    public AbstractStep toAbstract(MutableInt rowNr) throws InvalidRuleApplicationException {
+       return null;
+    }
+
 }

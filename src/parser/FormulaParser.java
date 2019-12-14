@@ -9,6 +9,9 @@ import java.util.ArrayList;
 public final class FormulaParser {
     public static Sentence parse(String formulaString) throws FormulaParsingException {
         FormulaTokenizer tokenizer = new FormulaTokenizer(formulaString);
+        if (!tokenizer.hasMoreTokens()) {
+            return null;
+        }
         return parseFormula(tokenizer.nextToken(), tokenizer);
     }
 

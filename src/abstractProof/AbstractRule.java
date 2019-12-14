@@ -1,0 +1,24 @@
+package abstractProof;
+
+public enum AbstractRule {
+    AUNDEFINED,
+    AREIT,
+    ACONJ_INTRO,
+    ACONJ_ELIM,
+    ADISJ_INTRO,
+    ADISJ_ELIM,
+    AIMPL_INTRO,
+    AIMPL_ELIM,
+    AEQIV_INTRO,
+    AEQIV_ELIM,
+    ANEGT_INTRO,
+    ANEGT_ELIM,
+    ACNTR_INTRO,
+    ACNTR_ELIM,
+    AUNVR_INTRO,
+    AUNVR_ELIM,
+    AEXST_INTRO,
+    AEXST_ELIM,
+    AEQLT_INTRO,
+    AEQLT_ELIM;
+}
