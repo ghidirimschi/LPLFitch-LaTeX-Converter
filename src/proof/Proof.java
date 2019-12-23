@@ -74,6 +74,6 @@ public class Proof {
             aSteps.add(step.toAbstract(rowNr));
         }
         return new AbstractProof(aPremises, aSteps);
-
+        //Todo: fix step nr
     }
 }

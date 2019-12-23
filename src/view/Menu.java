@@ -1,12 +1,14 @@
 package view;
 
-import parser.Parser;
+import controller.Controller;
+import org.apache.commons.lang3.StringUtils;
 import view.actionListeners.CopyToCbActionListener;
 import view.actionListeners.LoadActionListener;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 
 public class Menu {
@@ -15,8 +17,9 @@ public class Menu {
     private JButton loadHTMLbutton;
     private JButton copyToCBbutton;
     private JTextArea outputArea;
-    private JLabel statusField;
-
+    private JTextPane statusArea;
+    private JCheckBox checkWfCheckBox;
+    private Controller controller;
 
     private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -40,6 +43,11 @@ public class Menu {
         copyToCBbutton.addActionListener(new CopyToCbActionListener(this));
         ButtonsPanel.add(copyToCBbutton);
 
+        checkWfCheckBox = new JCheckBox("Check well-formedness");
+
+        ButtonsPanel.add(Box.createRigidArea(new Dimension(0, screenSize.width/100)));
+        ButtonsPanel.add(checkWfCheckBox);
+
         frame.add(Box.createHorizontalStrut(screenSize.width/100));
         frame.add(ButtonsPanel);
         frame.add(Box.createRigidArea(new Dimension(screenSize.width/100, 0)));
@@ -60,10 +68,18 @@ public class Menu {
         subPanel.add(scrollBox);
 
 
-
-        statusField = new JLabel("Status: Waiting for input...");
-        statusField.setAlignmentX(Component.LEFT_ALIGNMENT);
-        subPanel.add(statusField);
+        statusArea = new JTextPane();
+        statusArea.setContentType("text/html");
+        statusArea.setEditable(false);
+        Dimension statusDimension = new Dimension(screenSize.width/4, screenSize.height/4);
+        JScrollPane scrollStatusBox = new JScrollPane(statusArea);
+        scrollStatusBox.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollStatusBox.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollStatusBox.setMinimumSize(statusDimension);
+        scrollStatusBox.setPreferredSize(statusDimension);
+        scrollStatusBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        subPanel.add(scrollStatusBox);
+        updateStatus("Waiting for input...<hr>", 0);
 
         frame.add(subPanel);
 
@@ -75,27 +91,37 @@ public class Menu {
         return frame;
     }
 
-    public void updateParse(File[] files) {
-        StringBuilder texText = new StringBuilder();
-        for(File file : files) {
-            try {
-                texText.append("\\subsection*{").append(file.getName().replaceFirst("[.][^.]+$", "")).append("}");
-                texText.append(Parser.parse(file).exportLatex());
-            } catch (IOException e) {
-                setStatus("Error parsing " + file.getName() +"! <font color = 'red'>" + e.getMessage() + "</font>");
-                return;
-            }
-            setStatus("<font color = 'green'> Successfully converted " + files.length + " files! </font>");
-        }
-        outputArea.setText(texText.toString());
-        setStatus("<font color = 'green'> Successfully converted! </font>");
+    public void setOutputAreaText(String string) {
+        outputArea.setText(string);
     }
 
-    public void setStatus(String string) {
-        statusField.setText("<html>Status: " + string + "</html>");
+    public void updateStatus(String string) {
+        updateStatus(string, 1);
+    }
+
+    public void updateStatus(String string, int breakLinesNr)
+    {
+        HTMLDocument doc=(HTMLDocument) statusArea.getStyledDocument();
+        try {
+            doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), string + StringUtils.repeat("<br>", breakLinesNr));
+        } catch (BadLocationException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getLaTexOutput() {
         return outputArea.getText();
+    }
+
+    public boolean isCheckWfCheckBoxSelected() {
+        return checkWfCheckBox.isSelected();
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public Controller getController() {
+        return controller;
     }
 }

@@ -26,7 +26,7 @@ public class LoadActionListener implements ActionListener {
         fileChooser.setFileFilter(filter);
         int rtn = fileChooser.showOpenDialog(menu.getFrame());
         if(rtn == JFileChooser.APPROVE_OPTION) {
-            menu.updateParse(fileChooser.getSelectedFiles());
+            menu.getController().updateParse(fileChooser.getSelectedFiles());
             lastDirectory = fileChooser.getCurrentDirectory();
         }
     }

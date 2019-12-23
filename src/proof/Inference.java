@@ -54,11 +54,10 @@ public class Inference implements Step {
         ArrayList<Integer> citedSteps = new ArrayList<>(strSteps.length);
         for (String str : strSteps) {
             try {
-                citedSteps.add(Integer.valueOf(str));
+                citedSteps.add(Integer.valueOf(str.trim()));
             } catch (NumberFormatException e) {
                 throw new ConverterException(rowNr.intValue(), "Cited step must be a positive integer!");
             }
-            rowNr.increment();
         }
         return new AbstractInference(aWff, rule.toAbstract(), citedSteps);
      }

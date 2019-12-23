@@ -1,3 +1,4 @@
+import controller.Controller;
 import formulanew.*;
 import parser.FormulaParser;
 import parser.FormulaParsingException;
@@ -19,7 +20,11 @@ public class Main {
 //        }
 //        proof.exportLatex();
 //      FROM HERE WAS CORRECT:
-      new Menu();
+    Menu menu = new Menu();
+    Controller controller = new Controller(menu);
+
+
+
 //        try {
 //            Sentence sentence = FormulaParser.parse("¬¬A ∧ ¬(B ∨ D) ∧ (¬¬¬D ∨ K ∨ ¬∀x P(x))");
 //            System.out.println(sentence);

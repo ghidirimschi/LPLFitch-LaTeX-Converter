@@ -18,12 +18,12 @@ public class CopyToCbActionListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(menu.getLaTexOutput().isEmpty()) {
-            menu.setStatus("<font color = 'orange'> Nothing to copy yet! </font>");
+            menu.updateStatus("<font color = 'orange'> Nothing to copy yet! </font>");
             return;
         }
         StringSelection stringSelection = new StringSelection(menu.getLaTexOutput());
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
-        menu.setStatus("<font color = 'green'> Successfully copied to clipboard! </font>");
+        menu.updateStatus("<font color = 'green'> Successfully copied to clipboard! </font>");
     }
 }
