@@ -1,5 +1,6 @@
 package proof;
 
+import abstractProof.AbstractPremise;
 import abstractProof.AbstractProof;
 import abstractProof.AbstractStep;
 import formulanew.Sentence;
@@ -60,10 +61,10 @@ public class Proof {
 
     public AbstractProof toAbstract() throws ConverterException {
         MutableInt rowNr = new MutableInt(1);
-        ArrayList<Sentence> aPremises = new ArrayList<>(premises.size());
+        ArrayList<AbstractPremise> aPremises = new ArrayList<>(premises.size());
         for (Premise premise : premises) {
             try {
-                aPremises.add(FormulaParser.parse(premise.getWff()));
+                aPremises.add(new AbstractPremise(FormulaParser.parse(premise.getWff())));
             } catch (FormulaParsingException e) {
                 throw new ConverterException(rowNr.intValue(), e.getMessage());
             }

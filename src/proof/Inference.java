@@ -2,7 +2,9 @@ package proof;
 
 import abstractProof.AbstractInference;
 import abstractProof.AbstractStep;
+import abstractProof.StepRange;
 import formulanew.Sentence;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.mutable.MutableInt;
 import parser.FormulaParser;
 import parser.FormulaParsingException;
@@ -51,12 +53,24 @@ public class Inference implements Step {
         }
         rowNr.increment();
         String [] strSteps = ruleSupport.split(",");
-        ArrayList<Integer> citedSteps = new ArrayList<>(strSteps.length);
+        String [] range;
+        ArrayList<StepRange> citedSteps = new ArrayList<>(strSteps.length);
         for (String str : strSteps) {
+            range = str.trim().split("-");
             try {
-                citedSteps.add(Integer.valueOf(str.trim()));
-            } catch (NumberFormatException e) {
-                throw new ConverterException(rowNr.intValue(), "Cited step must be a positive integer!");
+                switch (range.length) {
+                    case 1:
+                        citedSteps.add(new StepRange(Integer.valueOf(range[0])));
+                        break;
+                    case 2:
+                        citedSteps.add(new StepRange(Integer.valueOf(range[0]), Integer.valueOf(range[1])));
+                        break;
+                    default:
+                        throw new NumberFormatException();
+                }
+            }
+            catch (NumberFormatException e) {
+                throw new ConverterException(rowNr.intValue(), "Cited step must be a positive integer or a range of 2 positive integers!");
             }
         }
         return new AbstractInference(aWff, rule.toAbstract(), citedSteps);

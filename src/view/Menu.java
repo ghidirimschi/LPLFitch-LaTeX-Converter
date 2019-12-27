@@ -9,6 +9,8 @@ import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class Menu {
@@ -19,6 +21,7 @@ public class Menu {
     private JTextArea outputArea;
     private JTextPane statusArea;
     private JCheckBox checkWfCheckBox;
+    private JCheckBox checkValidityCheckBox;
     private Controller controller;
 
     private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -44,9 +47,22 @@ public class Menu {
         ButtonsPanel.add(copyToCBbutton);
 
         checkWfCheckBox = new JCheckBox("Check well-formedness");
+        checkValidityCheckBox = new JCheckBox("Check validity");
+        checkValidityCheckBox.setEnabled(false);
+
+        checkWfCheckBox.addActionListener(e -> {
+            if (!isCheckWfCheckBoxSelected()) {
+                checkValidityCheckBox.setSelected(false);
+            }
+            checkValidityCheckBox.setEnabled(isCheckWfCheckBoxSelected());
+
+        });
 
         ButtonsPanel.add(Box.createRigidArea(new Dimension(0, screenSize.width/100)));
         ButtonsPanel.add(checkWfCheckBox);
+
+        ButtonsPanel.add(Box.createRigidArea(new Dimension(0, screenSize.width/800)));
+        ButtonsPanel.add(checkValidityCheckBox);
 
         frame.add(Box.createHorizontalStrut(screenSize.width/100));
         frame.add(ButtonsPanel);
@@ -117,6 +133,9 @@ public class Menu {
         return checkWfCheckBox.isSelected();
     }
 
+    public boolean isValidityCheckBoxSelected() {
+        return checkValidityCheckBox.isSelected();
+    }
     public void setController(Controller controller) {
         this.controller = controller;
     }

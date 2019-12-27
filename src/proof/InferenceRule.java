@@ -112,7 +112,7 @@ public enum InferenceRule {
         public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;
         }
-    }, EQLT_ELIM("= Elim", "\\by{$=$ Elim}", AbstractRule.AEQIV_ELIM) {
+    }, EQLT_ELIM("= Elim", "\\by{$=$ Elim}", AbstractRule.AEQLT_ELIM) {
         @Override
         public boolean isValidApplicationIn(Formula formula, ArrayList<Formula> citedSteps, boolean pedantic) {
             return true;

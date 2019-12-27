@@ -1,5 +1,7 @@
 package controller;
 
+import abstractProof.AbstractProof;
+import abstractProof.AbstractRuleCitingException;
 import parser.Parser;
 import proof.ConverterException;
 import proof.Proof;
@@ -19,7 +21,6 @@ public final class Controller {
     public void updateParse(File[] files) {
         StringBuilder texText = new StringBuilder();
         int parsedNr = 0;
-        boolean checkWf = view.isCheckWfCheckBoxSelected();
         for(File file : files) {
             view.updateStatus("Parsing " + file.getName() + "...");
             Proof proof;
@@ -33,20 +34,37 @@ public final class Controller {
             texText.append(proof.exportLatex());
             view.updateStatus("<font color = 'green'> Successfully converted " + file.getName() + ". </font>");
             ++parsedNr;
-            if (!checkWf) {
+            if (!view.isCheckWfCheckBoxSelected()) {
+                view.updateStatus("");
+                continue;
+            }
+            AbstractProof abstractProof;
+            try {
+                abstractProof = proof.toAbstract();
+            } catch (ConverterException e) {
+                view.updateStatus("<font color = 'red'> Well-formedness error:</font> " + e.getMessage());
+                continue;
+            }
+            view.updateStatus("<font color = 'green'>All inferences in " + file.getName() + " are well-formed!</font>");
+            if (!view.isValidityCheckBoxSelected()) {
                 view.updateStatus("");
                 continue;
             }
             try {
-                proof.toAbstract();
-            } catch (ConverterException e) {
-                view.updateStatus("<font color = 'red'> Well-formedness error:</font> " + e.getMessage(), 2);
-                continue;
+                if (abstractProof.isValid()) {
+                    view.updateStatus("<font color = 'green'>" + file.getName() + " is valid. </font>", 2);
+                } else {
+                    view.updateStatus("<font color = 'green'>" + file.getName() + " is invalid. </font>", 2);
+                }
+            } catch (AbstractRuleCitingException e) {
+                e.printStackTrace();
             }
-            view.updateStatus("<font color = 'green'>All inferences in " + file.getName() + "are well-formed!</font>", 2);
+
 
         }
         view.setOutputAreaText(texText.toString());
         view.updateStatus("Successfully converted " + parsedNr + "/" + files.length + " files!<hr>", 0);
+
+
     }
 }

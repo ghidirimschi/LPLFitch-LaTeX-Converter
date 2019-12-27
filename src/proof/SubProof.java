@@ -1,5 +1,6 @@
 package proof;
 
+import abstractProof.AbstractPremise;
 import abstractProof.AbstractStep;
 import abstractProof.AbstractSubProof;
 import formulanew.Sentence;
@@ -47,9 +48,9 @@ public class SubProof implements Step {
 
     @Override
     public AbstractStep toAbstract(MutableInt rowNr) throws ConverterException {
-        Sentence aPremise;
+        AbstractPremise aPremise;
         try {
-            aPremise = FormulaParser.parse(premise.getWff());
+            aPremise = new AbstractPremise(FormulaParser.parse(premise.getWff()));
         } catch (FormulaParsingException e) {
             throw new ConverterException(rowNr.intValue(), e.getMessage());
         }
