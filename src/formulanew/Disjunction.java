@@ -47,7 +47,7 @@ public final class Disjunction implements Sentence {
                 isEquals();
     }
 
-    private ArrayList<Sentence> getNestedDisjuncts() {
+    public ArrayList<Sentence> getNestedDisjuncts() {
         ArrayList<Sentence> nestedConjuncts = new ArrayList<>(2);
         if (firstDisjunct instanceof Disjunction) {
             nestedConjuncts.addAll(((Disjunction) firstDisjunct).getNestedDisjuncts());

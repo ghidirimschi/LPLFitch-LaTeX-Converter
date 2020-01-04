@@ -47,7 +47,7 @@ public final class Conjunction implements Sentence {
                 isEquals();
     }
 
-    private ArrayList<Sentence> getNestedConjuncts() {
+    public ArrayList<Sentence> getNestedConjuncts() {
         ArrayList<Sentence> nestedConjuncts = new ArrayList<>(2);
         if (firstConjunct instanceof Conjunction) {
             nestedConjuncts.addAll(((Conjunction) firstConjunct).getNestedConjuncts());

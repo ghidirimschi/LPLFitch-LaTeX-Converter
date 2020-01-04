@@ -1,5 +1,7 @@
 package abstractProof;
 
+import formulanew.Conjunction;
+import formulanew.Disjunction;
 import formulanew.Sentence;
 
 import java.util.ArrayList;
@@ -16,38 +18,78 @@ public enum AbstractRule {
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
             ArrayList<StepRange> stepRanges = inference.getCitedSteps();
             if (stepRanges.size() != 1 && !stepRanges.get(0).isSingleStep()) {
-                throw new AbstractRuleCitingException(rowNr, "Reiteration rule should cite only 1 inference step!");
+                throw new AbstractRuleCitingException(rowNr, "Reiteration rule should cite only 1 step!");
             }
             int citedStepRowNr = stepRanges.get(0).getMinimum();
-            AbstractStep reiteratedStep;
-            try {
-                reiteratedStep = AbstractRule.getStepAtRow(citedStepRowNr, runningSteps);
-            } catch (IndexOutOfBoundsException e) {
-                throw new AbstractRuleCitingException(rowNr, "Cited step is not accessible from the current inference!");
-            }
-            Sentence sentence = reiteratedStep.getSentence();
-            if (sentence == null) {
-                throw new AbstractRuleCitingException(rowNr, "Cited rule must be a premise or an inference!");
-            }
+            Sentence sentence = AbstractRule.getSentenceAtRow(rowNr, citedStepRowNr, runningSteps);
             return sentence.equals(inference.getSentence());
         }
     },
     ACONJ_INTRO {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() < 1) {
+                throw new AbstractRuleCitingException(rowNr, "Conjunction introduction rule should cite at least 1 step!");
+            }
+            for (StepRange stepRange : stepRanges) {
+                if (!stepRange.isSingleStep()) {
+                    throw new AbstractRuleCitingException(rowNr, "Conjunction introduction rule should cite only single steps!");
+                }
+            }
+            Sentence sentence = inference.getSentence();
+            if (!(sentence instanceof Conjunction)) {
+                return false;
+            }
+            ArrayList<Sentence> conjuncts = ((Conjunction) sentence).getNestedConjuncts();
+            Sentence tmp;
+            for (StepRange stepRange : stepRanges) {
+                tmp = AbstractRule.getSentenceAtRow(rowNr, stepRange.getMinimum(), runningSteps);
+                if (tmp instanceof Conjunction) {
+                    if (!conjuncts.containsAll(((Conjunction) tmp).getNestedConjuncts())) {
+                        return false;
+                    }
+                } else {
+                    if (!conjuncts.contains(tmp)) {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
     },
     ACONJ_ELIM {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 1 && !stepRanges.get(0).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Conjunction elimination rule should cite only 1 single step!");
+            }
+            Sentence citedStep = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps);
+            if (!(citedStep instanceof Conjunction)) {
+                throw new AbstractRuleCitingException(rowNr, "Cited step must be a conjunction!");
+            }
+            ArrayList<Sentence> conjuncts = ((Conjunction) citedStep).getNestedConjuncts();
+            Sentence sentence = inference.getSentence();
+            if (sentence instanceof Conjunction) {
+                return conjuncts.containsAll(((Conjunction) sentence).getNestedConjuncts());
+            }
+            return conjuncts.contains(sentence);
         }
     },
     ADISJ_INTRO {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 1 && !stepRanges.get(0).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Disjunction introduction rule should cite only 1 step!");
+            }
+            Sentence sentence = inference.getSentence();
+            if (!(sentence instanceof Disjunction)) {
+                return false;
+            }
+            return ((Disjunction) sentence).getNestedDisjuncts().contains(sentence);
+
         }
     },
     ADISJ_ELIM {
@@ -143,11 +185,21 @@ public enum AbstractRule {
 
     public abstract boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException;
 
-    private static AbstractStep getStepAtRow(int rowNr, ArrayList<AbstractStep> runningSteps) throws IndexOutOfBoundsException {
+
+    private static Sentence getSentenceAtRow(int fromRow, int rowNr, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
         int run = 0;
-        while ((rowNr -= runningSteps.get(run).rowSize()) > 0) {
-            ++run;
+        try {
+            while ((rowNr -= runningSteps.get(run).rowSize()) > 0) {
+                ++run;
+            }
+        } catch (IndexOutOfBoundsException e) {
+            rowNr = -1;
         }
-        return runningSteps.get(run);
+        Sentence rtn = runningSteps.get(run).getSentence();
+        if (rowNr < 0 || rtn == null) {
+            System.err.println(runningSteps.get(run));
+            throw new AbstractRuleCitingException(fromRow, "Cited step is not accessible from the current inference!");
+        }
+        return rtn;
     }
 }
