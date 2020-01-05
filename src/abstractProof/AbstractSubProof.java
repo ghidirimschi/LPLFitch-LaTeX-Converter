@@ -36,8 +36,21 @@ public final class AbstractSubProof implements AbstractStep {
         return sum;
     }
 
+    public boolean isDeryiving(Sentence sentence) {
+        for (AbstractStep step : steps) {
+            if (sentence.equals(step.getSentence())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public Sentence getSentence() {
         return null;
+    }
+
+    public AbstractPremise getPremise() {
+        return premise;
     }
 }

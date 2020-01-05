@@ -23,4 +23,8 @@ public final class StepRange {
         return range.getMinimum();
     }
 
+    public int getMaximum() {
+        return range.getMaximum();
+    }
+
 }

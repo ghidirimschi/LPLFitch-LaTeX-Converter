@@ -41,4 +41,12 @@ public final class Implication implements Sentence {
                 append(this.consequent, toCheck.consequent).
                 isEquals();
     }
+
+    public Sentence getAntecedent() {
+        return antecedent;
+    }
+
+    public Sentence getConsequent() {
+        return consequent;
+    }
 }

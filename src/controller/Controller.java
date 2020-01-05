@@ -54,7 +54,7 @@ public final class Controller {
                 if (abstractProof.isValid()) {
                     view.updateStatus("<font color = 'green'>" + file.getName() + " is valid. </font>", 2);
                 } else {
-                    view.updateStatus("<font color = 'green'>" + file.getName() + " is invalid. </font>", 2);
+                    view.updateStatus("<font color = 'red'>" + file.getName() + " is invalid. </font>", 2);
                 }
             } catch (AbstractRuleCitingException e) {
                 e.printStackTrace();

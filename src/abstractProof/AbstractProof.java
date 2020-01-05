@@ -15,7 +15,7 @@ public final class AbstractProof {
 
 
     public boolean isValid() throws AbstractRuleCitingException {
-        MutableInt rowNr = new MutableInt(1);
+        MutableInt rowNr = new MutableInt(premises.size() + 1);
         ArrayList<AbstractStep> runningSentences = new ArrayList<>(premises);
         for (AbstractStep step : steps) {
             if (!step.isValid(rowNr, runningSentences)) {
