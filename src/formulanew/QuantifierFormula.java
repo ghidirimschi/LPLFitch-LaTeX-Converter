@@ -42,4 +42,16 @@ public class QuantifierFormula implements Sentence {
                 append(this.sentence, rhs.sentence).
                 isEquals();
     }
+
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof QuantifierFormula)) return false;
+        if (other == this) return true;
+
+        if(!quantifiers.equals(((QuantifierFormula) other).quantifiers)) {
+            return false;
+        }
+
+        return sentence.isEqualWithReplacement(((QuantifierFormula) other).sentence, argument, newArgument);
+    }
 }

@@ -1,9 +1,6 @@
 package abstractProof;
 
-import formulanew.Conjunction;
-import formulanew.Disjunction;
-import formulanew.Implication;
-import formulanew.Sentence;
+import formulanew.*;
 
 import java.util.ArrayList;
 
@@ -18,7 +15,7 @@ public enum AbstractRule {
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
             ArrayList<StepRange> stepRanges = inference.getCitedSteps();
             if (stepRanges.size() != 1 || !stepRanges.get(0).isSingleStep()) {
-                throw new AbstractRuleCitingException(rowNr, "Reiteration rule should cite only 1 step!");
+                throw new AbstractRuleCitingException(rowNr, "Reiteration rule should cite only one support step!");
             }
             int citedStepRowNr = stepRanges.get(0).getMinimum();
             Sentence sentence = AbstractRule.getSentenceAtRow(rowNr, citedStepRowNr, runningSteps);
@@ -29,11 +26,11 @@ public enum AbstractRule {
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
             ArrayList<StepRange> stepRanges = inference.getCitedSteps();
             if (stepRanges.size() < 1) {
-                throw new AbstractRuleCitingException(rowNr, "Conjunction introduction rule should cite at least 1 step!");
+                throw new AbstractRuleCitingException(rowNr, "Conjunction introduction rule should cite at least one support step!");
             }
             for (StepRange stepRange : stepRanges) {
                 if (!stepRange.isSingleStep()) {
-                    throw new AbstractRuleCitingException(rowNr, "Conjunction introduction rule should cite only single steps!");
+                    throw new AbstractRuleCitingException(rowNr, "Conjunction introduction rule should cite only cite support steps!");
                 }
             }
             Sentence sentence = inference.getSentence();
@@ -61,7 +58,7 @@ public enum AbstractRule {
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
             ArrayList<StepRange> stepRanges = inference.getCitedSteps();
             if (stepRanges.size() != 1 || !stepRanges.get(0).isSingleStep()) {
-                throw new AbstractRuleCitingException(rowNr, "Conjunction elimination rule should cite only 1 single step!");
+                throw new AbstractRuleCitingException(rowNr, "Conjunction elimination rule should cite only one support step!");
             }
             Sentence citedStep = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps);
             if (!(citedStep instanceof Conjunction)) {
@@ -79,7 +76,7 @@ public enum AbstractRule {
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
             ArrayList<StepRange> stepRanges = inference.getCitedSteps();
             if (stepRanges.size() != 1 || !stepRanges.get(0).isSingleStep()) {
-                throw new AbstractRuleCitingException(rowNr, "Disjunction introduction rule should cite only 1 step!");
+                throw new AbstractRuleCitingException(rowNr, "Disjunction introduction rule should cite only one support step!");
             }
             Sentence sentence = inference.getSentence();
             Sentence citedSentence = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps);
@@ -113,7 +110,7 @@ public enum AbstractRule {
                 disjunctionStepNr = stepRange.getMinimum();
             }
             if (disjunctionStepNr == 0) {
-                throw new AbstractRuleCitingException(rowNr, "Disjunction elimination rule should cite exactly one single step!");
+                throw new AbstractRuleCitingException(rowNr, "Disjunction elimination rule should cite exactly one support step!");
             }
             Sentence sentence = inference.getSentence();
             Sentence citedSingleStep = AbstractRule.getSentenceAtRow(rowNr, disjunctionStepNr, runningSteps);
@@ -164,7 +161,7 @@ public enum AbstractRule {
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
             ArrayList<StepRange> stepRanges = inference.getCitedSteps();
             if (stepRanges.size() != 2 || !stepRanges.get(0).isSingleStep() || !stepRanges.get(1).isSingleStep()) {
-                throw new AbstractRuleCitingException(rowNr, "Implication introduction rule should cite exactly two single steps!");
+                throw new AbstractRuleCitingException(rowNr, "Implication elimination rule should cite exactly two support steps!");
             }
             Sentence sentence = inference.getSentence(), citedSentenceOne = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps),
                      citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
@@ -176,32 +173,96 @@ public enum AbstractRule {
     }, AEQIV_INTRO {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 2 || stepRanges.get(0).isSingleStep() || stepRanges.get(1).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Equivalence introduction rule should cite exactly two subproofs!");
+            }
+            Sentence sentence = inference.getSentence();
+            if (!(sentence instanceof BiImplication)) {
+                return false;
+            }
+            BiImplication biImplication = (BiImplication) sentence;
+            AbstractSubProof subProofOne = AbstractRule.getSubProofAtRows(rowNr, stepRanges.get(0).getMinimum(), stepRanges.get(0).getMaximum(), runningSteps),
+                             subProofTwo = AbstractRule.getSubProofAtRows(rowNr, stepRanges.get(1).getMinimum(), stepRanges.get(1).getMaximum(), runningSteps);
+            Sentence antecedent = biImplication.getAntecedent(), consequent = biImplication.getConsequent(),
+                    subProofOnePremise = subProofOne.getPremise().getSentence(), subProofTwoPremise= subProofTwo.getPremise().getSentence();
+            return (antecedent.equals(subProofOnePremise) && subProofOne.isDeryiving(consequent) || antecedent.equals(subProofTwoPremise) && subProofTwo.isDeryiving(consequent)) &&
+                   (consequent.equals(subProofOnePremise) && subProofOne.isDeryiving(antecedent) || consequent.equals(subProofTwoPremise) && subProofTwo.isDeryiving(antecedent));
         }
     }, AEQIV_ELIM {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 2 || !stepRanges.get(0).isSingleStep() || !stepRanges.get(1).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Equivalence elimination rule should cite exactly two support steps!");
+            }
+            Sentence sentence = inference.getSentence(), citedSentenceOne = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps),
+                    citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
+            BiImplication tmpBiImpl;
+            return ((citedSentenceOne instanceof BiImplication) && ((tmpBiImpl = (BiImplication)citedSentenceOne).getAntecedent().equals(citedSentenceTwo)
+                    && tmpBiImpl.getConsequent().equals(sentence) || tmpBiImpl.getConsequent().equals(citedSentenceTwo) &&  tmpBiImpl.getAntecedent().equals(sentence))) ||
+                    ((citedSentenceTwo instanceof BiImplication) && ((tmpBiImpl = (BiImplication) citedSentenceTwo).getAntecedent().equals(citedSentenceOne) && tmpBiImpl.getConsequent().equals(sentence)
+                    || tmpBiImpl.getConsequent().equals(citedSentenceOne) && tmpBiImpl.getAntecedent().equals(sentence)));
         }
     }, ANEGT_INTRO {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 1 || stepRanges.get(0).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Negation introduction rule should cite exactly one subproof!");
+            }
+            Sentence sentence = inference.getSentence();
+            if (!(sentence instanceof Negation)) {
+                return false;
+            }
+            Negation negation = (Negation) sentence;
+            AbstractSubProof citedSubProof = AbstractRule.getSubProofAtRows(rowNr, stepRanges.get(0).getMinimum(), stepRanges.get(0).getMaximum(), runningSteps);
+            return citedSubProof.getPremise().getSentence().equals(negation.getSentence()) && citedSubProof.isDeryiving(Contradiction.getInstance());
         }
     }, ANEGT_ELIM {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 1 || !stepRanges.get(0).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Negation elimination rule should cite exactly one support step!");
+            }
+            Sentence citedSentence = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps);
+            if (!(citedSentence instanceof Negation)) {
+                return false;
+            }
+            Sentence innerSentence = ((Negation) citedSentence).getSentence();
+            if (!(innerSentence instanceof Negation)) {
+                return false;
+            }
+            return inference.getSentence().equals(((Negation) innerSentence).getSentence());
+
         }
     }, ACNTR_INTRO {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 2 || !stepRanges.get(0).isSingleStep() || !stepRanges.get(1).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Contradiction introduction rule should cite exactly two support steps!");
+            }
+            Sentence sentence = inference.getSentence();
+            if (!(sentence instanceof Contradiction)) {
+                return false;
+            }
+            Sentence citedSentenceOne = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps),
+                     citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
+            return isSentenceNegationOf(citedSentenceOne, citedSentenceTwo) || isSentenceNegationOf(citedSentenceTwo, citedSentenceOne);
+        }
+        private boolean isSentenceNegationOf(Sentence sentence, Sentence negated) {
+            return (negated instanceof Negation) && ((Negation) negated).getSentence().equals(sentence);
         }
     }, ACNTR_ELIM {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 1 || !stepRanges.get(0).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Negation elimination rule should cite exactly one support step!");
+            }
+            return AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps).equals(Contradiction.getInstance());
         }
     }, AUNVR_INTRO {
         @Override
@@ -226,12 +287,37 @@ public enum AbstractRule {
     }, AEQLT_INTRO {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (!stepRanges.isEmpty()) {
+                throw new AbstractRuleCitingException(rowNr, "Equality introduction rule should cite no steps!");
+            }
+            Sentence sentence = inference.getSentence();
+            if (!(sentence instanceof Equality)) {
+                return false;
+            }
+            Equality equality = (Equality) sentence;
+            return equality.getFirstOperand().equals(equality.getSecondOperand());
         }
     }, AEQLT_ELIM {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
-            return true;
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            if (stepRanges.size() != 2 || !stepRanges.get(0).isSingleStep() || !stepRanges.get(1).isSingleStep()) {
+                throw new AbstractRuleCitingException(rowNr, "Equivalence elimination rule should cite exactly two support steps!");
+            }
+            Sentence sentence = inference.getSentence(), citedSentenceOne = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps),
+                    citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
+
+            return isSentenceValidReplacementOf(sentence, citedSentenceOne, citedSentenceTwo) || isSentenceValidReplacementOf(sentence, citedSentenceTwo, citedSentenceOne);
+        }
+
+        private boolean isSentenceValidReplacementOf(Sentence sentence, Sentence ofSentence, Sentence equalitySentence) {
+            if (!(equalitySentence instanceof Equality)) {
+                return false;
+            }
+            Equality equality = (Equality) equalitySentence;
+            return sentence.isEqualWithReplacement(ofSentence, equality.getFirstOperand(), equality.getSecondOperand()) ||
+                   sentence.isEqualWithReplacement(ofSentence, equality.getSecondOperand(), equality.getFirstOperand());
         }
     };
 

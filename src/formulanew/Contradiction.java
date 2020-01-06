@@ -16,4 +16,8 @@ public final class Contradiction implements Sentence {
         return Operator.LCONTR.getUTFCode();
     }
 
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        return true;
+    }
 }

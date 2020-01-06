@@ -41,4 +41,22 @@ public class BiImplication implements Sentence {
                 append(this.consequent, other.consequent).
                 isEquals();
     }
+
+    public Sentence getAntecedent() {
+        return antecedent;
+    }
+
+    public Sentence getConsequent() {
+        return consequent;
+    }
+
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof BiImplication))
+            return false;
+        if (other == this)
+            return true;
+
+        return antecedent.isEqualWithReplacement(((BiImplication) other).antecedent, argument, newArgument) && consequent.isEqualWithReplacement(((BiImplication) other).consequent, argument, newArgument);
+    }
 }

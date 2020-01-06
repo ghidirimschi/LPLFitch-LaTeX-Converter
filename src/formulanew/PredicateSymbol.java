@@ -43,4 +43,22 @@ public final class PredicateSymbol implements AtomicSentence {
                 append(this.arguments, toCheck.arguments).
                 isEquals();
     }
+
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof PredicateSymbol)) return false;
+        if (other == this) return true;
+        PredicateSymbol otherPredicateSymbol = (PredicateSymbol) other;
+
+        if (!this.name.equals(otherPredicateSymbol.name)) {
+            return false;
+        }
+
+        for (int idx = 0; idx < arguments.size(); ++idx) {
+            if (!(arguments.get(idx).isEqualWithReplacement(otherPredicateSymbol.arguments.get(idx), argument, newArgument))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

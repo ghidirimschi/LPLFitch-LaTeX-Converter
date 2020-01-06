@@ -61,4 +61,14 @@ public final class Conjunction implements Sentence {
         }
         return nestedConjuncts;
     }
+
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Conjunction))
+            return false;
+        if (other == this)
+            return true;
+
+        return firstConjunct.isEqualWithReplacement(((Conjunction) other).firstConjunct, argument, newArgument) && secondConjunct.isEqualWithReplacement(((Conjunction) other).secondConjunct, argument, newArgument);
+    }
 }

@@ -41,4 +41,22 @@ public final class Equality implements AtomicSentence {
                 isEquals();
 
     }
+
+    public Argument getFirstOperand() {
+        return firstOperand;
+    }
+
+    public Argument getSecondOperand() {
+        return secondOperand;
+    }
+
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Equality))
+            return false;
+        if (other == this)
+            return true;
+
+        return firstOperand.isEqualWithReplacement(((Equality) other).firstOperand, argument, newArgument) && secondOperand.isEqualWithReplacement(((Equality) other).secondOperand, argument, newArgument);
+    }
 }

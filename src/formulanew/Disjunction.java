@@ -61,4 +61,14 @@ public final class Disjunction implements Sentence {
         }
         return nestedConjuncts;
     }
+
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Disjunction))
+            return false;
+        if (other == this)
+            return true;
+
+        return firstDisjunct.isEqualWithReplacement(((Disjunction) other).firstDisjunct, argument, newArgument) && secondDisjunct.isEqualWithReplacement(((Disjunction) other).secondDisjunct, argument, newArgument);
+    }
 }

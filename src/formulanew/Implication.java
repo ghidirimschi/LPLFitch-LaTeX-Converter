@@ -49,4 +49,13 @@ public final class Implication implements Sentence {
     public Sentence getConsequent() {
         return consequent;
     }
+
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Implication))
+            return false;
+        if (other == this)
+            return true;
+        return antecedent.isEqualWithReplacement(((Implication) other).antecedent, argument, newArgument) && consequent.isEqualWithReplacement(((Implication) other).consequent, argument, newArgument);
+    }
 }

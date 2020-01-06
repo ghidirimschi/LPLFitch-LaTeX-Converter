@@ -38,5 +38,17 @@ public class Negation implements Sentence {
                 isEquals();
     }
 
+    public Sentence getSentence() {
+        return sentence;
+    }
 
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Negation))
+            return false;
+        if (other == this)
+            return true;
+
+        return sentence.isEqualWithReplacement(((Negation) other).sentence, argument, newArgument);
+    }
 }
