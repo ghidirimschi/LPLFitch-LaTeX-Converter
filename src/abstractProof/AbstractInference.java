@@ -29,6 +29,13 @@ public final class AbstractInference implements AbstractStep {
     }
 
     @Override
+    public void checkPedanticValidity(MutableInt rowNr, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException, AbstractRulePedanticException {
+        rule.isPedanticApplicationIn(rowNr.intValue(), this, runningSteps);
+        runningSteps.add(this);
+        rowNr.increment();
+    }
+
+    @Override
     public int rowSize() {
         return 1;
     }

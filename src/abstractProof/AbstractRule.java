@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public enum AbstractRule {
     AUNDEFINED {
         @Override
-        public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
+        public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) {
             return false;
         }
     }, AREIT {
@@ -311,6 +311,22 @@ public enum AbstractRule {
             return isSentenceValidReplacementOf(sentence, citedSentenceOne, citedSentenceTwo) || isSentenceValidReplacementOf(sentence, citedSentenceTwo, citedSentenceOne);
         }
 
+        @Override
+        public void isPedanticApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRulePedanticException, AbstractRuleCitingException {
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            Sentence sentence = inference.getSentence(), citedSentenceOne = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps),
+                    citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
+            if (! (citedSentenceTwo instanceof Equality)) {
+                throw new AbstractRulePedanticException(rowNr, "The second cited step must be the replacing equality!");
+            }
+            Equality equality = (Equality) citedSentenceTwo;
+
+            if (! citedSentenceOne.isEqualWithReplacement(sentence, equality.getFirstOperand(), equality.getSecondOperand())) {
+                throw new AbstractRulePedanticException(rowNr, "Only the left hand side operand of the equality can be replaced by the right hand side one. The converse is not allowed.");
+            }
+
+        }
+
         private boolean isSentenceValidReplacementOf(Sentence sentence, Sentence ofSentence, Sentence equalitySentence) {
             if (!(equalitySentence instanceof Equality)) {
                 return false;
@@ -323,6 +339,9 @@ public enum AbstractRule {
 
     public abstract boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException;
 
+    public void isPedanticApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRulePedanticException, AbstractRuleCitingException {
+
+    }
 
     private static Sentence getSentenceAtRow(int fromRow, int rowNr, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
         int run = 0;

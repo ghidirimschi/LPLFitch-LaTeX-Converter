@@ -24,4 +24,12 @@ public final class AbstractProof {
         }
         return true;
     }
+
+    public void checkPedanticValidity() throws AbstractRuleCitingException, AbstractRulePedanticException {
+        MutableInt rowNr = new MutableInt(premises.size() + 1);
+        ArrayList<AbstractStep> runningSentences = new ArrayList<>(premises);
+        for (AbstractStep step : steps) {
+           step.checkPedanticValidity(rowNr, runningSentences);
+        }
+    }
 }

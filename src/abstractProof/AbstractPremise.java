@@ -21,6 +21,12 @@ public final class AbstractPremise implements AbstractStep {
     }
 
     @Override
+    public void checkPedanticValidity(MutableInt rowNr, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException, AbstractRulePedanticException {
+        rowNr.increment();
+        runningSteps.add(this);
+    }
+
+    @Override
     public int rowSize() {
         return 1;
     }

@@ -9,8 +9,6 @@ import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class Menu {
@@ -22,6 +20,7 @@ public class Menu {
     private JTextPane statusArea;
     private JCheckBox checkWfCheckBox;
     private JCheckBox checkValidityCheckBox;
+    private JCheckBox pedanticCheckBox;
     private Controller controller;
 
     private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -48,14 +47,26 @@ public class Menu {
 
         checkWfCheckBox = new JCheckBox("Check well-formedness");
         checkValidityCheckBox = new JCheckBox("Check validity");
+        pedanticCheckBox = new JCheckBox("Pedantic");
+
         checkValidityCheckBox.setEnabled(false);
+        pedanticCheckBox.setEnabled(false);
 
         checkWfCheckBox.addActionListener(e -> {
             if (!isCheckWfCheckBoxSelected()) {
                 checkValidityCheckBox.setSelected(false);
+                pedanticCheckBox.setSelected(false);
             }
             checkValidityCheckBox.setEnabled(isCheckWfCheckBoxSelected());
+            pedanticCheckBox.setEnabled(isValidityCheckBoxSelected());
 
+        });
+
+        checkValidityCheckBox.addActionListener(e -> {
+            if (!isValidityCheckBoxSelected()) {
+                pedanticCheckBox.setSelected(false);
+            }
+            pedanticCheckBox.setEnabled(isValidityCheckBoxSelected());
         });
 
         ButtonsPanel.add(Box.createRigidArea(new Dimension(0, screenSize.width/100)));
@@ -63,6 +74,9 @@ public class Menu {
 
         ButtonsPanel.add(Box.createRigidArea(new Dimension(0, screenSize.width/800)));
         ButtonsPanel.add(checkValidityCheckBox);
+
+        ButtonsPanel.add(Box.createRigidArea(new Dimension(0, screenSize.width/800)));
+        ButtonsPanel.add(pedanticCheckBox);
 
         frame.add(Box.createHorizontalStrut(screenSize.width/100));
         frame.add(ButtonsPanel);
@@ -136,6 +150,11 @@ public class Menu {
     public boolean isValidityCheckBoxSelected() {
         return checkValidityCheckBox.isSelected();
     }
+
+    public boolean isPedanticCheckBoxSelected() {
+        return pedanticCheckBox.isSelected();
+    }
+
     public void setController(Controller controller) {
         this.controller = controller;
     }

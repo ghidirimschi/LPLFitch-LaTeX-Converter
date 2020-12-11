@@ -28,6 +28,16 @@ public final class AbstractSubProof implements AbstractStep {
     }
 
     @Override
+    public void checkPedanticValidity(MutableInt rowNr, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException, AbstractRulePedanticException {
+        ArrayList<AbstractStep> tmpRunningSteps = new ArrayList<>(runningSteps);
+        premise.checkPedanticValidity(rowNr, tmpRunningSteps);
+        for (AbstractStep step : steps) {
+            step.checkPedanticValidity(rowNr, tmpRunningSteps);
+        }
+        runningSteps.add(this);
+    }
+
+    @Override
     public int rowSize() {
         int sum = 1;
         for (AbstractStep step : steps) {

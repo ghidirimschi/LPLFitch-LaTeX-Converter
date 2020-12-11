@@ -2,6 +2,7 @@ package controller;
 
 import abstractProof.AbstractProof;
 import abstractProof.AbstractRuleCitingException;
+import abstractProof.AbstractRulePedanticException;
 import parser.Parser;
 import proof.ConverterException;
 import proof.Proof;
@@ -52,15 +53,25 @@ public final class Controller {
             }
             try {
                 if (abstractProof.isValid()) {
-                    view.updateStatus("<font color = 'green'>" + file.getName() + " is valid. </font>", 2);
+                    view.updateStatus("<font color = 'green'>" + file.getName() + " is valid. </font>");
                 } else {
                     view.updateStatus("<font color = 'red'>" + file.getName() + " is invalid. </font>", 2);
+                    continue;
                 }
             } catch (AbstractRuleCitingException e) {
-                e.printStackTrace();
+                view.updateStatus("<font color = 'red'> Citing error:</font> " + e.getMessage());
+
             }
-
-
+            if (!view.isPedanticCheckBoxSelected()) {
+                view.updateStatus("");
+                continue;
+            }
+            try {
+                abstractProof.checkPedanticValidity();
+            } catch (AbstractRuleCitingException | AbstractRulePedanticException e) {
+                view.updateStatus("<font color = 'maroon'> Pedantic error:" + e.getMessage() + "</font>");
+            }
+            view.updateStatus("");
         }
         view.setOutputAreaText(texText.toString());
         view.updateStatus("Successfully converted " + parsedNr + "/" + files.length + " files!<hr>", 0);
