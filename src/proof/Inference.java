@@ -51,14 +51,19 @@ public class Inference implements Step {
         } catch (FormulaParsingException e) {
             throw new ConverterException(rowNr.intValue(), e.getMessage());
         }
-        rowNr.increment();
         String [] strSteps = ruleSupport.split(",");
-        String [] range;
         ArrayList<StepRange> citedSteps = new ArrayList<>(strSteps.length);
+        if (ruleSupport.isEmpty()) {
+            rowNr.increment();
+            return new AbstractInference(aWff, rule.toAbstract(), citedSteps);
+        }
+        String [] range;
         for (String str : strSteps) {
             range = str.trim().split("-");
             try {
                 switch (range.length) {
+                    case 0:
+                        break;
                     case 1:
                         citedSteps.add(new StepRange(Integer.valueOf(range[0])));
                         break;
@@ -73,6 +78,7 @@ public class Inference implements Step {
                 throw new ConverterException(rowNr.intValue(), "Cited step must be a positive integer or a range of 2 positive integers!");
             }
         }
+        rowNr.increment();
         return new AbstractInference(aWff, rule.toAbstract(), citedSteps);
      }
 

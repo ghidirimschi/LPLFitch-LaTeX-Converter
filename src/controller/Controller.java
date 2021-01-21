@@ -43,7 +43,7 @@ public final class Controller {
             try {
                 abstractProof = proof.toAbstract();
             } catch (ConverterException e) {
-                view.updateStatus("<font color = 'red'> Well-formedness error:</font> " + e.getMessage());
+                view.updateStatus("<font color = 'red'> Well-formedness error:</font> " + e.getMessage(), 2);
                 continue;
             }
             view.updateStatus("<font color = 'green'>All inferences in " + file.getName() + " are well-formed!</font>");
@@ -59,8 +59,8 @@ public final class Controller {
                     continue;
                 }
             } catch (AbstractRuleCitingException e) {
-                view.updateStatus("<font color = 'red'> Citing error:</font> " + e.getMessage());
-
+                view.updateStatus("<font color = 'red'> Citing error:</font> " + e.getMessage(), 2);
+                continue;
             }
             if (!view.isPedanticCheckBoxSelected()) {
                 view.updateStatus("");

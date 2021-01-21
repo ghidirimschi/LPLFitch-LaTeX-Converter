@@ -38,6 +38,9 @@ public final class FormulaParser {
     }
 
     private static Sentence parseAtomic(String tkn, FormulaTokenizer tokenizer) throws FormulaParsingException {
+        if (tkn == null) {
+            throw new FormulaParsingException("Could not parse formula!");
+        }
         if (tkn.equals(Operator.LNOT.getUTFCode())) {
             return new Negation(parseAtomic(tokenizer.nextToken(), tokenizer));
         }

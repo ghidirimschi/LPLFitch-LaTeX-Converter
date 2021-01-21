@@ -170,6 +170,20 @@ public enum AbstractRule {
                     && tmpImpl.getConsequent().equals(sentence)) || ((citedSentenceTwo instanceof Implication) &&
                     (tmpImpl = (Implication)citedSentenceTwo).getAntecedent().equals(citedSentenceOne) && tmpImpl.getConsequent().equals(sentence));
         }
+
+        @Override
+        public void isPedanticApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRulePedanticException, AbstractRuleCitingException {
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            Sentence sentence = inference.getSentence(), citedSentenceOne = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps),
+                    citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
+            Implication tmpImpl;
+            if (!((citedSentenceOne instanceof Implication) && (tmpImpl = (Implication)citedSentenceOne).getAntecedent().equals(citedSentenceTwo)
+                    && tmpImpl.getConsequent().equals(sentence))) {
+                throw new AbstractRulePedanticException(rowNr, "The first cited step must be the antecedent of the second step, which must be an implication!");
+            }
+        }
+
+
     }, AEQIV_INTRO {
         @Override
         public boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
@@ -252,6 +266,19 @@ public enum AbstractRule {
                      citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
             return isSentenceNegationOf(citedSentenceOne, citedSentenceTwo) || isSentenceNegationOf(citedSentenceTwo, citedSentenceOne);
         }
+
+        @Override
+        public void isPedanticApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRulePedanticException, AbstractRuleCitingException {
+            ArrayList<StepRange> stepRanges = inference.getCitedSteps();
+            Sentence citedSentenceOne = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(0).getMinimum(), runningSteps),
+                    citedSentenceTwo = AbstractRule.getSentenceAtRow(rowNr, stepRanges.get(1).getMinimum(), runningSteps);
+
+            if (!isSentenceNegationOf(citedSentenceOne, citedSentenceTwo)) {
+                throw new AbstractRulePedanticException(rowNr, "The second cited step must be the negation of the first cited step. The reverse is not pedantically valid!");
+            }
+
+        }
+
         private boolean isSentenceNegationOf(Sentence sentence, Sentence negated) {
             return (negated instanceof Negation) && ((Negation) negated).getSentence().equals(sentence);
         }
