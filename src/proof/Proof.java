@@ -1,5 +1,13 @@
 package proof;
 
+import abstractProof.AbstractPremise;
+import abstractProof.AbstractProof;
+import abstractProof.AbstractStep;
+import formulanew.Sentence;
+import org.apache.commons.lang3.mutable.MutableInt;
+import parser.FormulaParser;
+import parser.FormulaParsingException;
+
 import java.util.ArrayList;
 
 public class Proof {
@@ -21,5 +29,52 @@ public class Proof {
 
     public ArrayList<Premise> getPremises() {
         return premises;
+    }
+
+    public ArrayList<Step> getSteps() {
+        return steps;
+    }
+
+    public void printProof() {
+        for(Premise premise : premises) {
+            premise.printPremise(1);
+        }
+        System.out.println("|-");
+        for(Step step : steps) {
+            step.printStep(1);
+        }
+    }
+
+    public String exportLatex() {
+        StringBuilder sb = new StringBuilder();
+        MutableInt row = new MutableInt(1);
+        sb.append("$\n\\begin{nd}\n");
+        for(Premise premise : premises) {
+            premise.exportLatex(sb, row);
+        }
+        for(Step step : steps) {
+            step.exportLatex(sb, row);
+        }
+        sb.append("\\end{nd}\n$\n");
+        return sb.toString();
+    }
+
+    public AbstractProof toAbstract() throws ConverterException {
+        MutableInt rowNr = new MutableInt(1);
+        ArrayList<AbstractPremise> aPremises = new ArrayList<>(premises.size());
+        for (Premise premise : premises) {
+            try {
+                aPremises.add(new AbstractPremise(FormulaParser.parse(premise.getWff())));
+            } catch (FormulaParsingException e) {
+                throw new ConverterException(rowNr.intValue(), e.getMessage());
+            }
+            rowNr.increment();
+        }
+        ArrayList<AbstractStep> aSteps = new ArrayList<>(steps.size());
+        for (Step step : steps) {
+            aSteps.add(step.toAbstract(rowNr));
+        }
+        return new AbstractProof(aPremises, aSteps);
+        //Todo: fix step nr
     }
 }

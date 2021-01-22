@@ -4,19 +4,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import proof.Inference;
-import proof.Premise;
-import proof.Proof;
-import proof.SubProof;
+import proof.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 public final class Parser {
 
-    public static Proof parse(String fileName) throws IOException {
-        File input = new File(fileName);
+    public static Proof parse(File input) throws IOException {
         Document doc = Jsoup.parse(input, "UTF-8");
         Element mainDiv = doc.selectFirst("div.proof-inner-outline");
         if(mainDiv == null || !mainDiv.child(0).attr("class").equals("proof")) {
@@ -58,7 +55,7 @@ public final class Parser {
                     proof.addStep(parseInference(curr.child(0)));
                     break;
                 case "proof":
-                    proof.addStep(parseSubProof(curr.child(0)));
+                    proof.addStep(parseSubProof(curr));
                     break;
                 default:
                     throw new IOException("Invalid proof html document. Code #0005.");
@@ -81,6 +78,23 @@ public final class Parser {
         return new Premise(wffWrapper.text());
     }
 
+    private static Premise parseSubProofPremise(Element premiseWrapper) throws IOException {
+        Element table = premiseWrapper.selectFirst("table");
+        if(table == null) {
+            throw new IOException("Invalid proof html document. Code #0006.");
+        }
+        Element wffWrapper = table.selectFirst("span[class=stepFormula]");
+        if(wffWrapper == null) {
+            throw new IOException("Invalid proof html document. Code #0007.");
+        }
+        Element guardWrapper = table.selectFirst("span[class=boxedconstants]");
+        if(guardWrapper == null) {
+            return new Premise(wffWrapper.text());
+        } else {
+            return new GuardPremise(wffWrapper.text(), guardWrapper.text());
+        }
+    }
+
     private static Inference parseInference(Element inferenceWrapper) throws IOException {
         Element table = inferenceWrapper.selectFirst("table");
         if(table == null) {
@@ -92,13 +106,41 @@ public final class Parser {
         if(wffWrapper == null || ruleNameWrapper == null || ruleSupportWrapper == null) {
             throw new IOException("Invalid proof html document. Code #0009.");
         }
-
-        return null;
+        InferenceRule inferenceRule = InferenceRule.parseInferenceRule(ruleNameWrapper.text().trim());
+        if(inferenceRule == null) {
+            throw new IOException("Invalid proof html document. Code #0010.");
+        }
+        return new Inference(wffWrapper.text(), inferenceRule, ruleSupportWrapper.hasText() ? ruleSupportWrapper.text().substring(2) : "");
     }
 
     private static SubProof parseSubProof(Element subProofWrapper) throws IOException {
-
-        return null;
+        Elements children = subProofWrapper.children();
+        Element premiseWrapper = children.first();
+        Element fitchBar = children.get(1);
+        if(premiseWrapper == null || !premiseWrapper.tagName().equals("div") || !premiseWrapper.attr("class").equals("step")) {
+            throw new IOException("Invalid proof html document. Code #0011.");
+        }
+        if(fitchBar == null || !fitchBar.tagName().equals("div") || !fitchBar.attr("class").equals("fitchbar")) {
+            throw new IOException("Invalid proof html document. Code #0012.");
+        }
+        SubProof subProof = new SubProof(parseSubProofPremise(premiseWrapper));
+        List<Element> subProofStepsWrapper = children.subList(2, children.size());
+        for(Element curr : subProofStepsWrapper) {
+            if (!curr.tagName().equals("div")) {
+                throw new IOException("Invalid proof html document. Code #0013.");
+            }
+            switch (curr.attr("class")) {
+                case "step":
+                    subProof.addStep(parseInference(curr.child(0)));
+                    break;
+                case "proof":
+                    subProof.addStep(parseSubProof(curr));
+                    break;
+                default:
+                    throw new IOException("Invalid proof html document. Code #0014.");
+            }
+        }
+        return subProof;
     }
 
 }
