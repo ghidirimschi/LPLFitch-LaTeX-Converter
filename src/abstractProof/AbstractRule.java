@@ -1,9 +1,15 @@
 package abstractProof;
 
-import formulanew.*;
+import formula.*;
 
 import java.util.ArrayList;
 
+
+/**
+ * This enum class implements the abstract representation of a Fitch rule and enumerates all the possible rules.
+ * All listed rules must implement the isValidApplicationIn method (see description below) and optionally the
+ * isPedanticApplicationIn method.
+ */
 public enum AbstractRule {
     AUNDEFINED {
         @Override
@@ -364,12 +370,37 @@ public enum AbstractRule {
         }
     };
 
+    /**
+     * Verifies if a given inference is valid based on a list of running steps. It is an abstract method
+     * and all rules must implement it.
+     * @param rowNr         the number of the row on which the inference is located
+     * @param inference     the inference, represented as an abstract inference
+     * @param runningSteps  the list of running steps
+     * @return true if valid, false otherwise
+     * @throws AbstractRuleCitingException if the format of the cited steps does not correspond to the required format of the rule
+     * (e.g. wrong number of steps cited, an inference cited instead of a subproof)
+     */
     public abstract boolean isValidApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException;
 
+    /**
+     * Verifies if a given inference is pedantically valid based on a list of running steps. This is an optional
+     * method which allows rules to implement other validity constraints.
+     * @param rowNr         the number of the row on which the inference is located
+     * @param inference     the inference, represented as an abstract inference
+     * @param runningSteps  the list of running steps
+     * @throws AbstractRulePedanticException if the rule violates the pedantic constraints
+     */
     public void isPedanticApplicationIn(int rowNr, AbstractInference inference, ArrayList<AbstractStep> runningSteps) throws AbstractRulePedanticException, AbstractRuleCitingException {
-
     }
 
+    /**
+     * Returns the corresponding sentence at a given global row from the specified list of running steps.
+     * @param fromRow       the row number of the inference from which the sentence is tried to be accessed.
+     * @param rowNr         the row number of the inference which is tried to be accessed
+     * @param runningSteps  the list of running steps
+     * @return              the sentence
+     * @throws AbstractRuleCitingException if the rule can not be accessed from the source row number.
+     */
     private static Sentence getSentenceAtRow(int fromRow, int rowNr, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
         int run = 0;
         try {
@@ -386,6 +417,9 @@ public enum AbstractRule {
         return rtn;
     }
 
+    /**
+     * Same as above, but for subproofs.
+     */
     private static AbstractSubProof getSubProofAtRows(int fromRow, int rowNrBegin, int rowNrEnd, ArrayList<AbstractStep> runningSteps) throws AbstractRuleCitingException {
         int run = 0, rowNr = rowNrBegin;
         AbstractStep rtn = null;

@@ -3,14 +3,17 @@ package proof;
 import abstractProof.AbstractInference;
 import abstractProof.AbstractStep;
 import abstractProof.StepRange;
-import formulanew.Sentence;
-import org.apache.commons.lang3.Range;
+import formula.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
 import parser.FormulaParser;
 import parser.FormulaParsingException;
 
 import java.util.ArrayList;
 
+/**
+ * This class implements the CST representation of a Fitch inference. It consists of a single logical formula,
+ * an inference rule and and a rule support, all in String representation. It implements the Step interface.
+ */
 public class Inference implements Step {
     private String wff;
     private InferenceRule rule;

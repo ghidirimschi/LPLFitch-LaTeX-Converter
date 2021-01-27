@@ -36,11 +36,6 @@ public final class Forall implements Quantifier {
         return new EqualsBuilder().
                 append(this.freeVariable, toCheck.freeVariable).
                 isEquals();
-
     }
 
-    @Override
-    public Operator getMainOperator() {
-        return Operator.LALL;
-    }
 }

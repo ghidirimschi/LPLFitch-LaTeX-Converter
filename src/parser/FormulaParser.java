@@ -1,11 +1,15 @@
 package parser;
 
-import formulanew.*;
+import formula.*;
 import proof.Operator;
 import tokenizer.FormulaTokenizer;
 
 import java.util.ArrayList;
 
+/**
+ * This class implements the methods for parsing a wff logical formula.
+ * Please refer to the final report for more details.
+ */
 public final class FormulaParser {
     public static Sentence parse(String formulaString) throws FormulaParsingException {
         FormulaTokenizer tokenizer = new FormulaTokenizer(formulaString);

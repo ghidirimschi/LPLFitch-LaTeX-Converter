@@ -2,7 +2,7 @@ package formula;
 
 import proof.Operator;
 
-public final class Contradiction implements Predicate {
+public final class Contradiction implements Sentence {
     private static final Contradiction instance = new Contradiction();
 
     private Contradiction() {}
@@ -17,7 +17,7 @@ public final class Contradiction implements Predicate {
     }
 
     @Override
-    public Operator getMainOperator() {
-        return null;
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        return true;
     }
 }

@@ -1,4 +1,4 @@
-package formulanew;
+package formula;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -6,6 +6,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+/**
+ * This class implements both the quantifier expressions of the <formula> non-terminal.
+ * This allows for a minor optimization for formula having multiple nested quantifiers.
+ */
 public class QuantifierFormula implements Sentence {
     private final ArrayList<Quantifier> quantifiers;
     private final Sentence sentence;
@@ -23,7 +27,6 @@ public class QuantifierFormula implements Sentence {
     @Override
     public String toString() {
         return "(" + (quantifiers.isEmpty() ? "" : quantifiers.stream().map(s -> s.toString() + " ").collect(Collectors.joining())) + sentence + ")";
-        //TODO: remove is empty
     }
 
     @Override

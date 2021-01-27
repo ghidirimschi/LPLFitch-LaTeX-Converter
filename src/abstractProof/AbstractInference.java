@@ -1,10 +1,15 @@
 package abstractProof;
 
-import formulanew.Sentence;
+import formula.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
 
+
+/**
+ * This class implements the abstract representation of an inference. It consists of a well-formed formula (logical sentence),
+ * a logical rule and a list of cited steps. It implements the AbstractStep interface.
+ */
 public final class AbstractInference implements AbstractStep {
     private final Sentence sentence;
     private final AbstractRule rule;

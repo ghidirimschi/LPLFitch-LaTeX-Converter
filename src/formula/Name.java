@@ -38,4 +38,8 @@ public final class Name implements Argument {
     }
 
 
+    @Override
+    public boolean isEqualWithReplacement(Argument other, Argument argument, Argument newArgument) {
+        return equals(other) || (equals(argument) && other.equals(newArgument));
+    }
 }

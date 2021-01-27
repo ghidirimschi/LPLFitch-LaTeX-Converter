@@ -2,6 +2,9 @@ package proof;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
+/**
+ * This is a Premise subclass in CST representation which contains a guard variable.
+ */
 public class GuardPremise extends Premise {
     private String guardVar;
 

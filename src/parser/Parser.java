@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This class implements the methods for parsing a HTML exported LPL Fitch proof.
+ * Please refer to the final report for more details.
+ */
 public final class Parser {
 
     public static Proof parse(File input) throws IOException {

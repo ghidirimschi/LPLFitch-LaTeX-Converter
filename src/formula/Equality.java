@@ -2,9 +2,8 @@ package formula;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import proof.Operator;
 
-public final class Equality implements Predicate {
+public final class Equality implements AtomicSentence {
     private final Argument firstOperand;
     private final Argument secondOperand;
     private final int hash;
@@ -20,7 +19,7 @@ public final class Equality implements Predicate {
 
     @Override
     public String toString() {
-        return firstOperand + " = " + secondOperand;
+        return "(" +  firstOperand + " = " + secondOperand + ")";
     }
 
     @Override
@@ -43,8 +42,21 @@ public final class Equality implements Predicate {
 
     }
 
+    public Argument getFirstOperand() {
+        return firstOperand;
+    }
+
+    public Argument getSecondOperand() {
+        return secondOperand;
+    }
+
     @Override
-    public Operator getMainOperator() {
-        return Operator.EQUALS;
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Equality))
+            return false;
+        if (other == this)
+            return true;
+
+        return firstOperand.isEqualWithReplacement(((Equality) other).firstOperand, argument, newArgument) && secondOperand.isEqualWithReplacement(((Equality) other).secondOperand, argument, newArgument);
     }
 }

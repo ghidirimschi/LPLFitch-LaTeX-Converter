@@ -11,6 +11,9 @@ import view.Menu;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * This class implements the controller part of our application, according to the MVC pattern.
+ */
 public final class Controller {
     private final Menu view;
 
@@ -19,6 +22,10 @@ public final class Controller {
         view.setController(this);
     }
 
+    /**
+     * This method generates the model based on the input files and options specified in the view.
+     * @param files the input files
+     */
     public void updateParse(File[] files) {
         StringBuilder texText = new StringBuilder();
         int parsedNr = 0;

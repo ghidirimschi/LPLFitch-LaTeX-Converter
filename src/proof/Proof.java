@@ -3,13 +3,16 @@ package proof;
 import abstractProof.AbstractPremise;
 import abstractProof.AbstractProof;
 import abstractProof.AbstractStep;
-import formulanew.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
 import parser.FormulaParser;
 import parser.FormulaParsingException;
 
 import java.util.ArrayList;
 
+/**
+ * This class implements the CST representation of a Fitch proof. It consists of a list of premises and another
+ * list of steps, as well in CST representation.
+ */
 public class Proof {
     private ArrayList<Premise> premises;
     private ArrayList<Step> steps;
@@ -27,24 +30,10 @@ public class Proof {
         steps.add(step);
     }
 
-    public ArrayList<Premise> getPremises() {
-        return premises;
-    }
-
-    public ArrayList<Step> getSteps() {
-        return steps;
-    }
-
-    public void printProof() {
-        for(Premise premise : premises) {
-            premise.printPremise(1);
-        }
-        System.out.println("|-");
-        for(Step step : steps) {
-            step.printStep(1);
-        }
-    }
-
+    /**
+     * Compiles the CST to LaTeX representation.
+     * @return the LaTeX representation.
+     */
     public String exportLatex() {
         StringBuilder sb = new StringBuilder();
         MutableInt row = new MutableInt(1);
@@ -59,6 +48,11 @@ public class Proof {
         return sb.toString();
     }
 
+    /**
+     * Converts the CST to AST representation.
+     * @return the AST representation.
+     * @throws ConverterException if the conversion was impossible (e.g. one of the formula was not well-formed)
+     */
     public AbstractProof toAbstract() throws ConverterException {
         MutableInt rowNr = new MutableInt(1);
         ArrayList<AbstractPremise> aPremises = new ArrayList<>(premises.size());
@@ -75,6 +69,5 @@ public class Proof {
             aSteps.add(step.toAbstract(rowNr));
         }
         return new AbstractProof(aPremises, aSteps);
-        //Todo: fix step nr
     }
 }

@@ -1,28 +1,34 @@
 package formula;
 
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import proof.Operator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
-public final class Conjunction {
-    private final ArrayList<Disjunction> disjunctions;
+public final class Conjunction implements Sentence {
+    private final Sentence firstConjunct;
+    private final Sentence secondConjunct;
+    private final ArrayList<Sentence> nestedConjuncts;
+    private final HashSet<Sentence> nestedConjunctsSet;
     private final int hash;
 
-    public Conjunction(ArrayList<Disjunction> disjunctions) {
-        this.disjunctions = new ArrayList<>(disjunctions);
+    public Conjunction(Sentence firstConjunct, Sentence secondConjunct) {
+        this.firstConjunct = firstConjunct;
+        this.secondConjunct = secondConjunct;
+        this.nestedConjuncts = getNestedConjuncts();
+        this.nestedConjunctsSet = new HashSet<>(nestedConjuncts);
         hash = new HashCodeBuilder(1523, 2287).
-                append(this.disjunctions).
+                append(this.nestedConjunctsSet).
                 toHashCode();
     }
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(disjunctions.get(0).toString());
-        disjunctions.stream().skip(1).forEach(s -> stringBuilder.append(" ").append(Operator.LAND.getUTFCode()).append(" ").append(s));
-        return stringBuilder.toString();
+        StringBuilder stringBuilder = new StringBuilder(nestedConjuncts.get(0).toString());
+        nestedConjuncts.stream().skip(1).forEach(s -> stringBuilder.append(" ").append(Operator.LAND.getUTFCode()).append(" ").append(s));
+        return "(" + stringBuilder.toString() + ")";
     }
 
     @Override
@@ -35,21 +41,34 @@ public final class Conjunction {
         if (!(obj instanceof Conjunction)) return false;
         if (obj == this) return true;
 
-        Conjunction toCheck = (Conjunction) obj;
+        Conjunction other = (Conjunction) obj;
         return new EqualsBuilder().
-                append(this.disjunctions, toCheck.disjunctions).
+                append(this.nestedConjunctsSet, other.nestedConjunctsSet).
                 isEquals();
     }
 
-    Operator getMainOperator() {
-        return disjunctions.size() == 1 ? disjunctions.get(0).getMainOperator() : Operator.LAND;
+    public ArrayList<Sentence> getNestedConjuncts() {
+        ArrayList<Sentence> nestedConjuncts = new ArrayList<>(2);
+        if (firstConjunct instanceof Conjunction) {
+            nestedConjuncts.addAll(((Conjunction) firstConjunct).getNestedConjuncts());
+        } else {
+            nestedConjuncts.add(firstConjunct);
+        }
+        if (secondConjunct instanceof Conjunction) {
+            nestedConjuncts.addAll(((Conjunction) secondConjunct).getNestedConjuncts());
+        } else {
+            nestedConjuncts.add(secondConjunct);
+        }
+        return nestedConjuncts;
     }
 
-    public ArrayList<Disjunction> getDisjunctions() {
-        return new ArrayList<>(disjunctions);
-    }
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Conjunction))
+            return false;
+        if (other == this)
+            return true;
 
-    Formula toFormula() {
-        return new Implication(this, null).toFormula();
+        return firstConjunct.isEqualWithReplacement(((Conjunction) other).firstConjunct, argument, newArgument) && secondConjunct.isEqualWithReplacement(((Conjunction) other).secondConjunct, argument, newArgument);
     }
 }

@@ -11,6 +11,9 @@ import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
 import java.io.IOException;
 
+/**
+ * This class implements the view part of our application, according to the MVC pattern.
+ */
 public class Menu {
     private JFrame frame;
     private JPanel ButtonsPanel;
