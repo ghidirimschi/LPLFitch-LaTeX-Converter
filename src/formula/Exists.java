@@ -38,9 +38,4 @@ public final class Exists implements Quantifier {
                 isEquals();
 
     }
-
-    @Override
-    public Operator getMainOperator() {
-        return Operator.LEXST;
-    }
 }

@@ -2,6 +2,9 @@ package proof;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * This enum class implements the CST representation of logical operators and enumerates them.
+ */
 public enum Operator {
     LAND("\u2227", "\\land "),
     LOR("\u2228", "\\lor "),
@@ -30,6 +33,11 @@ public enum Operator {
     private static final String[] htmlchars = new String[]{"\u2227", "\u2228", "\u2192", "\u2194", "\u00AC", "\u22A5", "\u2200", "\u2203"};
     private static final String[] texCodes = new String[]{"\\land ", "\\lor ", "\\rightarrow ", "\\leftrightarrow ", "\\neg ", "\\bot ", "\\forall ", "\\exists "};
 
+    /**
+     * This method normalizes the string representation of formula.
+     * @param wff the formula
+     * @return the normalized reprsentation
+     */
     public static String convertWff(String wff) {
         StringBuilder sb = new StringBuilder();
         char curr;

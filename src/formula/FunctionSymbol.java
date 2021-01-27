@@ -47,4 +47,22 @@ public final class FunctionSymbol implements Argument {
     }
 
 
+    @Override
+    public boolean isEqualWithReplacement(Argument other, Argument argument, Argument newArgument) {
+        if (!(other instanceof FunctionSymbol))
+            return false;
+        if (other == this)
+            return true;
+
+        FunctionSymbol otherFunctionSymbol = (FunctionSymbol) other;
+        if (!funcName.equals(otherFunctionSymbol.funcName) || arguments.size() != otherFunctionSymbol.arguments.size())
+            return false;
+
+        for (int idx = 0; idx < arguments.size(); ++idx) {
+            if (!(arguments.get(idx).isEqualWithReplacement(otherFunctionSymbol.arguments.get(idx), argument, newArgument))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

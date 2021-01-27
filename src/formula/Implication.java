@@ -4,12 +4,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import proof.Operator;
 
-public final class Implication {
-    private final Conjunction antecedent;
-    private final Conjunction consequent;
+public final class Implication implements Sentence {
+    private final Sentence antecedent;
+    private final Sentence consequent;
     private final int hash;
 
-    public Implication(Conjunction antecedent, Conjunction consequent) {
+    public Implication(Sentence antecedent, Sentence consequent) {
         this.antecedent = antecedent;
         this.consequent = consequent;
         hash = new HashCodeBuilder(9781, 17137).
@@ -20,7 +20,7 @@ public final class Implication {
 
     @Override
     public String toString() {
-        return antecedent + (consequent == null ? "" : " " + Operator.LIF.getUTFCode() + " " + consequent);
+        return "(" + antecedent + " " + Operator.LIF.getUTFCode() + " " + consequent + ")";
     }
 
     @Override
@@ -42,19 +42,20 @@ public final class Implication {
                 isEquals();
     }
 
-    Operator getMainOperator() {
-        return consequent == null ? antecedent.getMainOperator() : Operator.LIF;
-    }
-
-    public Conjunction getAntecedent() {
+    public Sentence getAntecedent() {
         return antecedent;
     }
 
-    public Conjunction getConsequent() {
+    public Sentence getConsequent() {
         return consequent;
     }
 
-    Formula toFormula() {
-        return new Wff(this, null).toFormula();
+    @Override
+    public boolean isEqualWithReplacement(Sentence other, Argument argument, Argument newArgument) {
+        if (!(other instanceof Implication))
+            return false;
+        if (other == this)
+            return true;
+        return antecedent.isEqualWithReplacement(((Implication) other).antecedent, argument, newArgument) && consequent.isEqualWithReplacement(((Implication) other).consequent, argument, newArgument);
     }
 }

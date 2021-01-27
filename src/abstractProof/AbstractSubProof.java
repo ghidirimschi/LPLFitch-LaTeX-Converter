@@ -1,10 +1,14 @@
 package abstractProof;
 
-import formulanew.Sentence;
+import formula.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
 
+/**
+ * This class implements the abstract representation of a Fitch subproof. It consists of a list of premises and another
+ * list of steps. It implements the AbstractStep interface.
+ */
 public final class AbstractSubProof implements AbstractStep {
     private final AbstractPremise premise;
     private final ArrayList<AbstractStep> steps;

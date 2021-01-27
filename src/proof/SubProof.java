@@ -3,13 +3,16 @@ package proof;
 import abstractProof.AbstractPremise;
 import abstractProof.AbstractStep;
 import abstractProof.AbstractSubProof;
-import formulanew.Sentence;
 import org.apache.commons.lang3.mutable.MutableInt;
 import parser.FormulaParser;
 import parser.FormulaParsingException;
 
 import java.util.ArrayList;
 
+/**
+ * This class implements the CST representation of a Fitch subproof. It consists of a single premise and a
+ * list of steps, as well in CST representation. It implements the Step interface.
+ */
 public class SubProof implements Step {
     private Premise premise;
     private ArrayList<Step> steps;

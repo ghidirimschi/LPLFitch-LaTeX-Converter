@@ -2,6 +2,11 @@ package proof;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
+
+/**
+ * This class implements the CST representation of a premise. It consists of a single logical formula
+ * in String representation. It implements the Step interface.
+ */
 public class Premise {
     private String wff;
 
