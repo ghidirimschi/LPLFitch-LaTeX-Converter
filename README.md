@@ -1,6 +1,6 @@
 # LPL Fitch Latex Converter
 
-This tool allows to convert a proof written in LPL Fitch (exported as HTML) to LaTeX, using ["LaTeX macros for Fitch style natural deduction"](https://www.mathstat.dal.ca/~selinger/fitch/) by Peter Selinger.
+This tool allows to convert a proof written in LPL Fitch (exported as HTML) to LaTeX, using ["LaTeX macros for Fitch style natural deduction"](https://www.mathstat.dal.ca/~selinger/fitch/) by Peter Selinger. Above this, it also contains a well-formedness and (pedantic) validity checker.
 
 This is an example output and a corresponding preview:
 ![alt text](https://github.com/ghidirimschi/LPLFitch-Latex-Converter/blob/master/LaTeX%20example1.png?raw=true)
